@@ -4,7 +4,7 @@
      This code was originally written by Jack Wang for
         CSC418, SPRING 2005
 
-    implementations of util.h  
+    implementations of util.h
 
 ***********************************************************/
 
@@ -17,7 +17,7 @@ Point3D::Point3D() {
   m_data[2] = 0.0;
 }
 
-Point3D::Point3D(double x, double y, double z) { 
+Point3D::Point3D(double x, double y, double z) {
   m_data[0] = x;
   m_data[1] = y;
   m_data[2] = z;
@@ -43,14 +43,14 @@ double& Point3D::operator[](int i) {
 double Point3D::operator[](int i) const {
   return m_data[i];
 }
-  
+
 Vector3D::Vector3D() {
   m_data[0] = 0.0;
   m_data[1] = 0.0;
   m_data[2] = 0.0;
 }
 
-Vector3D::Vector3D(double x, double y, double z) { 
+Vector3D::Vector3D(double x, double y, double z) {
   m_data[0] = x;
   m_data[1] = y;
   m_data[2] = z;
@@ -94,7 +94,7 @@ double Vector3D::normalize() {
         z = z / x;
         denom = 1.0 / (x * sqrt(1.0 + y*y + z*z));
       }
-    } else { /* z > x > y */ 
+    } else { /* z > x > y */
       if(1.0 + z > 1.0) {
         y = y / z;
         x = x / z;
@@ -129,8 +129,8 @@ double Vector3D::normalize() {
 
 double Vector3D::dot(const Vector3D& other) const
 {
-  return m_data[0]*other.m_data[0] + 
-    m_data[1]*other.m_data[1] + 
+  return m_data[0]*other.m_data[0] +
+    m_data[1]*other.m_data[1] +
     m_data[2]*other.m_data[2];
 }
 
@@ -177,7 +177,7 @@ Point3D operator -(const Point3D& u, const Vector3D& v)
   return Point3D(u[0]-v[0], u[1]-v[1], u[2]-v[2]);
 }
 
-Vector3D cross(const Vector3D& u, const Vector3D& v) 
+Vector3D cross(const Vector3D& u, const Vector3D& v)
 {
   return u.cross(v);
 }
@@ -198,7 +198,7 @@ Colour::Colour() {
   m_data[2] = 0.0;
 }
 
-Colour::Colour(double r, double g, double b) { 
+Colour::Colour(double r, double g, double b) {
   m_data[0] = r;
   m_data[1] = g;
   m_data[2] = b;
@@ -218,8 +218,8 @@ Colour& Colour::operator =(const Colour& other) {
 }
 
 Colour Colour::operator *(const Colour& other) {
-  return Colour(m_data[0]*other.m_data[0], 
-    m_data[1]*other.m_data[1], 
+  return Colour(m_data[0]*other.m_data[0],
+    m_data[1]*other.m_data[1],
     m_data[2]*other.m_data[2]);
 }
 
@@ -232,8 +232,8 @@ double Colour::operator[](int i) const {
 
 void Colour::clamp() {
   for (int i = 0; i < 3; i++) {
-    if (m_data[i] > 1.0) m_data[i] = 1.0; 
-    if (m_data[i] < 0.0) m_data[i] = 0.0; 
+    if (m_data[i] > 1.0) m_data[i] = 1.0;
+    if (m_data[i] < 0.0) m_data[i] = 0.0;
   }
 }
 
@@ -259,7 +259,7 @@ Vector4D::Vector4D() {
   m_data[3] = 0.0;
 }
 
-Vector4D::Vector4D(double w, double x, double y, double z) { 
+Vector4D::Vector4D(double w, double x, double y, double z) {
   m_data[0] = w;
   m_data[1] = x;
   m_data[2] = y;
@@ -289,8 +289,8 @@ double Vector4D::operator[](int i) const {
 }
 
 Matrix4x4::Matrix4x4() {
-  for (int i = 0; i < 16; i++) 
-    m_data[i] = 0.0; 
+  for (int i = 0; i < 16; i++)
+    m_data[i] = 0.0;
   m_data[0] = 1.0;
   m_data[5] = 1.0;
   m_data[10] = 1.0;
@@ -298,18 +298,18 @@ Matrix4x4::Matrix4x4() {
 }
 
 Matrix4x4::Matrix4x4(const Matrix4x4& other) {
-  for (int i = 0; i < 16; i++) 
-    m_data[i] = other.m_data[i]; 
+  for (int i = 0; i < 16; i++)
+    m_data[i] = other.m_data[i];
 }
 
 Matrix4x4& Matrix4x4::operator=(const Matrix4x4& other) {
-  for (int i = 0; i < 16; i++) 
-    m_data[i] = other.m_data[i]; 
+  for (int i = 0; i < 16; i++)
+    m_data[i] = other.m_data[i];
   return *this;
 }
 
 Vector4D Matrix4x4::getRow(int row) const {
-  return Vector4D(m_data[4*row], m_data[4*row+1], m_data[4*row+2], 
+  return Vector4D(m_data[4*row], m_data[4*row+1], m_data[4*row+2],
       m_data[4*row+3]);
 }
 
@@ -318,7 +318,7 @@ double* Matrix4x4::getRow(int row) {
 }
 
 Vector4D Matrix4x4::getColumn(int col) const {
-  return Vector4D(m_data[col], m_data[4+col], m_data[8+col], 
+  return Vector4D(m_data[col], m_data[4+col], m_data[8+col],
       m_data[12+col]);
 }
 
@@ -331,15 +331,15 @@ double* Matrix4x4::operator[](int row) {
 }
 
 Matrix4x4 Matrix4x4::transpose() const {
-  Matrix4x4 M; 
+  Matrix4x4 M;
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j < 4; j++) {
-      M[i][j] = (*this)[j][i]; 
+      M[i][j] = (*this)[j][i];
     }
   }
-  return M; 
+  return M;
 }
- 
+
 Matrix4x4 operator *(const Matrix4x4& a, const Matrix4x4& b) {
   Matrix4x4 ret;
 
@@ -347,7 +347,7 @@ Matrix4x4 operator *(const Matrix4x4& a, const Matrix4x4& b) {
     Vector4D row = a.getRow(i);
 
     for(size_t j = 0; j < 4; ++j) {
-      ret[i][j] = row[0] * b[0][j] + row[1] * b[1][j] + 
+      ret[i][j] = row[0] * b[0][j] + row[1] * b[1][j] +
         row[2] * b[2][j] + row[3] * b[3][j];
     }
   }
@@ -377,13 +377,13 @@ Vector3D transNorm(const Matrix4x4& M, const Vector3D& n) {
 }
 
 std::ostream& operator <<(std::ostream& os, const Matrix4x4& M) {
-  return os << "[" << M[0][0] << " " << M[0][1] << " " 
+  return os << "[" << M[0][0] << " " << M[0][1] << " "
     << M[0][2] << " " << M[0][3] << "]" << std::endl
-    << "[" << M[1][0] << " " << M[1][1] << " " 
+    << "[" << M[1][0] << " " << M[1][1] << " "
     << M[1][2] << " " << M[1][3] << "]" << std::endl
-    << "[" << M[2][0] << " " << M[2][1] << " " 
+    << "[" << M[2][0] << " " << M[2][1] << " "
     << M[2][2] << " " << M[2][3] << "]" << std::endl
-    << "[" << M[3][0] << " " << M[3][1] << " " 
+    << "[" << M[3][0] << " " << M[3][1] << " "
     << M[3][2] << " " << M[3][3] << "]";
 }
 

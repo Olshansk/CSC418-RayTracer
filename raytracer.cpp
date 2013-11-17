@@ -4,9 +4,9 @@
      This code was originally written by Jack Wang for
         CSC418, SPRING 2005
 
-    Implementations of functions in raytracer.h, 
-    and the main function which specifies the 
-    scene to be rendered.  
+    Implementations of functions in raytracer.h,
+    and the main function which specifies the
+    scene to be rendered.
 
 ***********************************************************/
 
@@ -25,13 +25,13 @@ Raytracer::~Raytracer() {
   delete _root;
 }
 
-SceneDagNode* Raytracer::addObject( SceneDagNode* parent, 
+SceneDagNode* Raytracer::addObject( SceneDagNode* parent,
     SceneObject* obj, Material* mat ) {
   SceneDagNode* node = new SceneDagNode( obj, mat );
   node->parent = parent;
   node->next = NULL;
   node->child = NULL;
-  
+
   // Add the object to the parent's child list, this means
   // whatever transformation applied to the parent will also
   // be applied to the child.
@@ -45,7 +45,7 @@ SceneDagNode* Raytracer::addObject( SceneDagNode* parent,
     }
     parent->next = node;
   }
-  
+
   return node;;
 }
 
@@ -59,7 +59,7 @@ void Raytracer::rotate( SceneDagNode* node, char axis, double angle ) {
   Matrix4x4 rotation;
   double toRadian = 2*M_PI/360.0;
   int i;
-  
+
   for (i = 0; i < 2; i++) {
     switch(axis) {
       case 'x':
@@ -88,50 +88,50 @@ void Raytracer::rotate( SceneDagNode* node, char axis, double angle ) {
       break;
     }
     if (i == 0) {
-        node->trans = node->trans*rotation;   
+        node->trans = node->trans*rotation;
       angle = -angle;
-    } 
+    }
     else {
-      node->invtrans = rotation*node->invtrans; 
-    }  
+      node->invtrans = rotation*node->invtrans;
+    }
   }
 }
 
 void Raytracer::translate( SceneDagNode* node, Vector3D trans ) {
   Matrix4x4 translation;
-  
+
   translation[0][3] = trans[0];
   translation[1][3] = trans[1];
   translation[2][3] = trans[2];
-  node->trans = node->trans*translation;   
+  node->trans = node->trans*translation;
   translation[0][3] = -trans[0];
   translation[1][3] = -trans[1];
   translation[2][3] = -trans[2];
-  node->invtrans = translation*node->invtrans; 
+  node->invtrans = translation*node->invtrans;
 }
 
 void Raytracer::scale( SceneDagNode* node, Point3D origin, double factor[3] ) {
   Matrix4x4 scale;
-  
+
   scale[0][0] = factor[0];
   scale[0][3] = origin[0] - factor[0] * origin[0];
   scale[1][1] = factor[1];
   scale[1][3] = origin[1] - factor[1] * origin[1];
   scale[2][2] = factor[2];
   scale[2][3] = origin[2] - factor[2] * origin[2];
-  node->trans = node->trans*scale;   
+  node->trans = node->trans*scale;
   scale[0][0] = 1/factor[0];
   scale[0][3] = origin[0] - 1/factor[0] * origin[0];
   scale[1][1] = 1/factor[1];
   scale[1][3] = origin[1] - 1/factor[1] * origin[1];
   scale[2][2] = 1/factor[2];
   scale[2][3] = origin[2] - 1/factor[2] * origin[2];
-  node->invtrans = scale*node->invtrans; 
+  node->invtrans = scale*node->invtrans;
 }
 
-Matrix4x4 Raytracer::initInvViewMatrix( Point3D eye, Vector3D view, 
+Matrix4x4 Raytracer::initInvViewMatrix( Point3D eye, Vector3D view,
     Vector3D up ) {
-  Matrix4x4 mat; 
+  Matrix4x4 mat;
   Vector3D w;
   view.normalize();
   up = up - up.dot(view)*view;
@@ -151,7 +151,7 @@ Matrix4x4 Raytracer::initInvViewMatrix( Point3D eye, Vector3D view,
   mat[1][3] = eye[1];
   mat[2][3] = eye[2];
 
-  return mat; 
+  return mat;
 }
 
 void Raytracer::traverseScene( SceneDagNode* node, Ray3D& ray ) {
@@ -160,7 +160,7 @@ void Raytracer::traverseScene( SceneDagNode* node, Ray3D& ray ) {
   // Applies transformation of the current node to the global
   // transformation matrices.
   _modelToWorld = _modelToWorld*node->trans;
-  _worldToModel = node->invtrans*_worldToModel; 
+  _worldToModel = node->invtrans*_worldToModel;
   if (node->obj) {
     // Perform intersection.
     if (node->obj->intersect(ray, _worldToModel, _modelToWorld)) {
@@ -215,23 +215,23 @@ void Raytracer::flushPixelBuffer( char *file_name ) {
 }
 
 Colour Raytracer::shadeRay( Ray3D& ray ) {
-  Colour col(0.0, 0.0, 0.0); 
-  traverseScene(_root, ray); 
-  
-  // Don't bother shading if the ray didn't hit 
+  Colour col(0.0, 0.0, 0.0);
+  traverseScene(_root, ray);
+
+  // Don't bother shading if the ray didn't hit
   // anything.
   if (!ray.intersection.none) {
-    computeShading(ray); 
-    col = ray.col;  
+    computeShading(ray);
+    col = ray.col;
   }
 
-  // You'll want to call shadeRay recursively (with a different ray, 
-  // of course) here to implement reflection/refraction effects.  
+  // You'll want to call shadeRay recursively (with a different ray,
+  // of course) here to implement reflection/refraction effects.
 
-  return col; 
-}  
+  return col;
+}
 
-void Raytracer::render( int width, int height, Point3D eye, Vector3D view, 
+void Raytracer::render( int width, int height, Point3D eye, Vector3D view,
     Vector3D up, double fov, char* fileName ) {
   Matrix4x4 viewToWorld;
   _scrWidth = width;
@@ -244,7 +244,7 @@ void Raytracer::render( int width, int height, Point3D eye, Vector3D view,
   // Construct a ray for each pixel.
   for (int i = 0; i < _scrHeight; i++) {
     for (int j = 0; j < _scrWidth; j++) {
-      // Sets up ray origin and direction in view space, 
+      // Sets up ray origin and direction in view space,
       // image plane is at z = -1.
       Point3D origin(0, 0, 0);
       Point3D imagePlane;
@@ -252,12 +252,12 @@ void Raytracer::render( int width, int height, Point3D eye, Vector3D view,
       imagePlane[1] = (-double(height)/2 + 0.5 + i)/factor;
       imagePlane[2] = -1;
 
-      // TODO: Convert ray to world space and call 
-      // shadeRay(ray) to generate pixel colour.   
-      
+      // TODO: Convert ray to world space and call
+      // shadeRay(ray) to generate pixel colour.
+
       Ray3D ray;
 
-      Colour col = shadeRay(ray); 
+      Colour col = shadeRay(ray);
 
       _rbuffer[i*width+j] = int(col[0]*255);
       _gbuffer[i*width+j] = int(col[1]*255);
@@ -269,15 +269,15 @@ void Raytracer::render( int width, int height, Point3D eye, Vector3D view,
 }
 
 int main(int argc, char* argv[])
-{  
-  // Build your scene and setup your camera here, by calling 
+{
+  // Build your scene and setup your camera here, by calling
   // functions from Raytracer.  The code here sets up an example
   // scene and renders it from two different view points, DO NOT
-  // change this if you're just implementing part one of the 
-  // assignment.  
+  // change this if you're just implementing part one of the
+  // assignment.
   Raytracer raytracer;
-  int width = 320; 
-  int height = 240; 
+  int width = 320;
+  int height = 240;
 
   if (argc == 3) {
     width = atoi(argv[1]);
@@ -291,42 +291,42 @@ int main(int argc, char* argv[])
   double fov = 60;
 
   // Defines a material for shading.
-  Material gold( Colour(0.3, 0.3, 0.3), Colour(0.75164, 0.60648, 0.22648), 
-      Colour(0.628281, 0.555802, 0.366065), 
+  Material gold( Colour(0.3, 0.3, 0.3), Colour(0.75164, 0.60648, 0.22648),
+      Colour(0.628281, 0.555802, 0.366065),
       51.2 );
-  Material jade( Colour(0, 0, 0), Colour(0.54, 0.89, 0.63), 
-      Colour(0.316228, 0.316228, 0.316228), 
+  Material jade( Colour(0, 0, 0), Colour(0.54, 0.89, 0.63),
+      Colour(0.316228, 0.316228, 0.316228),
       12.8 );
 
   // Defines a point light source.
-  raytracer.addLightSource( new PointLight(Point3D(0, 0, 5), 
+  raytracer.addLightSource( new PointLight(Point3D(0, 0, 5),
         Colour(0.9, 0.9, 0.9) ) );
 
   // Add a unit square into the scene with material mat.
   SceneDagNode* sphere = raytracer.addObject( new UnitSphere(), &gold );
   SceneDagNode* plane = raytracer.addObject( new UnitSquare(), &jade );
-  
+
   // Apply some transformations to the unit square.
   double factor1[3] = { 1.0, 2.0, 1.0 };
   double factor2[3] = { 6.0, 6.0, 6.0 };
-  raytracer.translate(sphere, Vector3D(0, 0, -5));  
-  raytracer.rotate(sphere, 'x', -45); 
-  raytracer.rotate(sphere, 'z', 45); 
+  raytracer.translate(sphere, Vector3D(0, 0, -5));
+  raytracer.rotate(sphere, 'x', -45);
+  raytracer.rotate(sphere, 'z', 45);
   raytracer.scale(sphere, Point3D(0, 0, 0), factor1);
 
-  raytracer.translate(plane, Vector3D(0, 0, -7));  
-  raytracer.rotate(plane, 'z', 45); 
+  raytracer.translate(plane, Vector3D(0, 0, -7));
+  raytracer.rotate(plane, 'z', 45);
   raytracer.scale(plane, Point3D(0, 0, 0), factor2);
 
   // Render the scene, feel free to make the image smaller for
-  // testing purposes.  
+  // testing purposes.
   raytracer.render(width, height, eye, view, up, fov, "view1.bmp");
-  
+
   // Render it from a different point of view.
   Point3D eye2(4, 2, 1);
   Vector3D view2(-4, -2, -6);
   raytracer.render(width, height, eye2, view2, up, fov, "view2.bmp");
-  
+
   return 0;
 }
 

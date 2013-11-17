@@ -40,11 +40,11 @@ LIBS          = $(GL_LIBS) $(GLUT_LIBS) -lm $(XLIBS) -ldl
 LINKER        = g++
 
 # Define all object files to be the same as CPPSRCS but with all the
-# .cpp and .c suffixes replaced with .o 
+# .cpp and .c suffixes replaced with .o
 OBJ           = $(CPPSRCS:.cpp=.o) $(CSRCS:.c=.o)
 
 # Define name of target executable
-PROGRAM           = raytracer 
+PROGRAM           = raytracer
 
 # Define all C source files here
 CSRCS         =
@@ -54,7 +54,7 @@ CPPSRCS       = raytracer.cpp util.cpp light_source.cpp scene_object.cpp bmp_io.
 
 ##############################################################################
 # Define additional rules that make should know about in order to compile our
-# files.                                        
+# files.
 ##############################################################################
 
 # Define default rule if Make is run without arguments
@@ -63,17 +63,17 @@ all : $(PROGRAM)
 # Define rule for compiling all C++ files
 %.o : %.cpp
 	$(CCC) $(CCCFLAGS) $(CPPFLAGS) $*.cpp
-	
+
 # Define rule for compiling all C files
 %.o : %.c
 	$(CC) $(CFLAGS) $(CPPFLAGS) $*.c
-	
+
 # Define rule for creating executable
 $(PROGRAM) :	$(OBJ)
 		@echo -n "Loading $(PROGRAM) ... "
 		$(LINKER) $(LDFLAGS) $(OBJ) $(LIBS) -o $(PROGRAM)
 		@echo "done"
-		
+
 # Define rule to clean up directory by removing all object, temp and core
 # files along with the executable
 clean :

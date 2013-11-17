@@ -8,7 +8,7 @@ using namespace std;
 # include "bmp_io.h"
 
 //
-//  BMP_BYTE_SWAP controls how the program assumes that the bytes in 
+//  BMP_BYTE_SWAP controls how the program assumes that the bytes in
 //  multi-byte data are ordered.
 //
 //  "true" is the correct value to use when running on a little-endian machine,
@@ -24,15 +24,15 @@ bool bmp_byte_swap_get ( void )
 //****************************************************************************
 //
 //  Purpose:
-// 
+//
 //    BMP_BYTE_SWAP_GET returns the internal value of BMP_BYTE_SWAP.
-// 
+//
 //  Modified:
-// 
+//
 //    26 February 2003
 //
 //  Author:
-// 
+//
 //    John Burkardt
 //
 //  Parameters:
@@ -49,15 +49,15 @@ void bmp_byte_swap_set ( bool value )
 //****************************************************************************
 //
 //  Purpose:
-// 
+//
 //    BMP_BYTE_SWAP_SET sets the internal value of BMP_BYTE_SWAP.
-// 
+//
 //  Modified:
-// 
+//
 //    26 February 2003
 //
 //  Author:
-// 
+//
 //    John Burkardt
 //
 //  Parameters:
@@ -71,15 +71,15 @@ void bmp_byte_swap_set ( bool value )
 }
 //****************************************************************************
 
-bool bmp_08_data_read ( ifstream &file_in, unsigned long int width, long int height, 
+bool bmp_08_data_read ( ifstream &file_in, unsigned long int width, long int height,
   unsigned char *rarray )
 
 //****************************************************************************
 //
 //  Purpose:
-//  
+//
 //    BMP_08_DATA_READ reads 8 bit image data of the BMP file.
-// 
+//
 //  Discussion:
 //
 //    On output, the RGB information in the file has been copied into the
@@ -95,7 +95,7 @@ bool bmp_08_data_read ( ifstream &file_in, unsigned long int width, long int hei
 //    monochrome images, but could easily be modified to do so.
 //
 //  Modified:
-// 
+//
 //    01 April 2005
 //
 //  Author:
@@ -147,7 +147,7 @@ bool bmp_08_data_read ( ifstream &file_in, unsigned long int width, long int hei
   indexr = rarray;
   numbyte = 0;
 
-  for ( j = 0; j < abs ( height ); j++ ) 
+  for ( j = 0; j < abs ( height ); j++ )
   {
     for ( i = 0; i < width; i++ )
     {
@@ -155,7 +155,7 @@ bool bmp_08_data_read ( ifstream &file_in, unsigned long int width, long int hei
 
       error = file_in.eof();
 
-      if ( error ) 
+      if ( error )
       {
         cout << "\n";
         cout << "BMP_08_DATA_READ: Fatal error!\n";
@@ -195,19 +195,19 @@ bool bmp_08_data_read ( ifstream &file_in, unsigned long int width, long int hei
 }
 //****************************************************************************
 
-void bmp_08_data_write ( ofstream &file_out, unsigned long int width, 
+void bmp_08_data_write ( ofstream &file_out, unsigned long int width,
   long int height, unsigned char *rarray )
 
 //****************************************************************************
 //
 //  Purpose:
-//  
+//
 //    BMP_08_DATA_WRITE writes 8 bit image data to a BMP file.
 //
 //  Discussion:
 //
 //    This routine does not seem to be performing properly.  The monochrome
-//    images it creates cannot be read by the XV program, which says that 
+//    images it creates cannot be read by the XV program, which says that
 //    they seem to have been prematurely truncated.
 //
 //    The BMP format requires that each horizontal line be a multiple of 4 bytes.
@@ -217,11 +217,11 @@ void bmp_08_data_write ( ofstream &file_out, unsigned long int width,
 //    code, was supplied by Lee Mulcahy.
 //
 //  Modified:
-// 
+//
 //    02 April 2005
 //
 //  Author:
-// 
+//
 //    John Burkardt
 //
 //  References:
@@ -280,15 +280,15 @@ void bmp_08_data_write ( ofstream &file_out, unsigned long int width,
 }
 //****************************************************************************
 
-bool bmp_24_data_read ( ifstream &file_in, unsigned long int width, long int height, 
+bool bmp_24_data_read ( ifstream &file_in, unsigned long int width, long int height,
   unsigned char *rarray, unsigned char *garray, unsigned char *barray )
 
 //****************************************************************************
 //
 //  Purpose:
-//  
+//
 //    BMP_24_DATA_READ reads 24 bit image data of the BMP file.
-// 
+//
 //  Discussion:
 //
 //    On output, the RGB information in the file has been copied into the
@@ -301,11 +301,11 @@ bool bmp_24_data_read ( ifstream &file_in, unsigned long int width, long int hei
 //    it will be deceived by characters that "look like" new lines.
 //
 //  Modified:
-// 
+//
 //    11 December 2004
 //
 //  Author:
-// 
+//
 //    John Burkardt
 //
 //  References:
@@ -332,7 +332,7 @@ bool bmp_24_data_read ( ifstream &file_in, unsigned long int width, long int hei
 //
 //    Input, long int HEIGHT, the Y dimension of the image.
 //
-//    Input, unsigned char *RARRAY, *GARRAY, *BARRAY, pointers to the 
+//    Input, unsigned char *RARRAY, *GARRAY, *BARRAY, pointers to the
 //    red, green and blue color arrays.
 //
 //    Output, bool BMP_24_DATA_READ, is true if an error occurred.
@@ -357,7 +357,7 @@ bool bmp_24_data_read ( ifstream &file_in, unsigned long int width, long int hei
   indexb = barray;
   numbyte = 0;
 
-  for ( j = 0; j < abs ( height ); j++ ) 
+  for ( j = 0; j < abs ( height ); j++ )
   {
     for ( i = 0; i < width; i++ )
     {
@@ -382,7 +382,7 @@ bool bmp_24_data_read ( ifstream &file_in, unsigned long int width, long int hei
 
       error = file_in.eof();
 
-      if ( error ) 
+      if ( error )
       {
         cout << "\n";
         cout << "BMP_24_DATA_READ: Fatal error!\n";
@@ -398,7 +398,7 @@ bool bmp_24_data_read ( ifstream &file_in, unsigned long int width, long int hei
 
       error = file_in.eof();
 
-      if ( error ) 
+      if ( error )
       {
         cout << "\n";
         cout << "BMP_24_DATA_READ: Fatal error!\n";
@@ -438,14 +438,14 @@ bool bmp_24_data_read ( ifstream &file_in, unsigned long int width, long int hei
 }
 //****************************************************************************
 
-void bmp_24_data_write ( ofstream &file_out, unsigned long int width, 
-  long int height, unsigned char *rarray, unsigned char *garray, 
+void bmp_24_data_write ( ofstream &file_out, unsigned long int width,
+  long int height, unsigned char *rarray, unsigned char *garray,
   unsigned char *barray )
 
 //****************************************************************************
 //
 //  Purpose:
-//  
+//
 //    BMP_24_DATA_WRITE writes 24 bit image data to the BMP file.
 //
 //  Discussion:
@@ -457,11 +457,11 @@ void bmp_24_data_write ( ofstream &file_out, unsigned long int width,
 //    code, was supplied by Lee Mulcahy.
 //
 //  Modified:
-// 
+//
 //    11 December 2004
 //
 //  Author:
-// 
+//
 //    John Burkardt
 //
 //  References:
@@ -530,14 +530,14 @@ void bmp_24_data_write ( ofstream &file_out, unsigned long int width,
 }
 //****************************************************************************
 
-void bmp_header1_print ( unsigned short int filetype, 
-  unsigned long int filesize, unsigned short int reserved1, 
+void bmp_header1_print ( unsigned short int filetype,
+  unsigned long int filesize, unsigned short int reserved1,
   unsigned short int reserved2, unsigned long int bitmapoffset )
 
 //****************************************************************************
 //
 //  Purpose:
-// 
+//
 //    BMP_HEADER1_PRINT prints the header information of a BMP file.
 //
 //  Discussion:
@@ -551,11 +551,11 @@ void bmp_header1_print ( unsigned short int filetype,
 //    4 bytes BITMAPOFFSET.    Starting position of image data, in bytes.
 //
 //  Modified:
-// 
+//
 //    05 March 2004
-// 
+//
 //  Author:
-// 
+//
 //    John Burkardt
 //
 //  References:
@@ -600,14 +600,14 @@ void bmp_header1_print ( unsigned short int filetype,
 }
 //****************************************************************************
 
-bool bmp_header1_read ( ifstream &file_in, unsigned short int *filetype, 
-  unsigned long int *filesize, unsigned short int *reserved1, 
+bool bmp_header1_read ( ifstream &file_in, unsigned short int *filetype,
+  unsigned long int *filesize, unsigned short int *reserved1,
   unsigned short int *reserved2, unsigned long int *bitmapoffset )
 
 //****************************************************************************
 //
 //  Purpose:
-// 
+//
 //    BMP_HEADER1_READ reads the header information of a BMP file.
 //
 //  Discussion:
@@ -621,11 +621,11 @@ bool bmp_header1_read ( ifstream &file_in, unsigned short int *filetype,
 //    4 bytes BITMAPOFFSET.    Starting position of image data, in bytes.
 //
 //  Modified:
-// 
+//
 //    15 December 2004
-// 
+//
 //  Author:
-// 
+//
 //    John Burkardt
 //
 //  References:
@@ -661,7 +661,7 @@ bool bmp_header1_read ( ifstream &file_in, unsigned short int *filetype,
 {
   bool error;
   char i1;
-  char i2;  
+  char i2;
 //
 //  Read FILETYPE.
 //
@@ -684,7 +684,7 @@ bool bmp_header1_read ( ifstream &file_in, unsigned short int *filetype,
 //  Read FILESIZE.
 //
   error = u_long_int_read ( filesize, file_in );
-  if ( error ) 
+  if ( error )
   {
     return error;
   }
@@ -719,13 +719,13 @@ bool bmp_header1_read ( ifstream &file_in, unsigned short int *filetype,
 //****************************************************************************
 
 void bmp_header1_write ( ofstream &file_out, unsigned short int filetype,
-  unsigned long int filesize, unsigned short int reserved1, 
+  unsigned long int filesize, unsigned short int reserved1,
   unsigned short int reserved2, unsigned long int bitmapoffset )
 
 //****************************************************************************
 //
 //  Purpose:
-// 
+//
 //    BMP_HEADER1_WRITE writes the header information to a BMP file.
 //
 //  Discussion:
@@ -739,11 +739,11 @@ void bmp_header1_write ( ofstream &file_out, unsigned short int filetype,
 //    4 bytes BITMAPOFFSET.    Starting position of image data, in bytes.
 //
 //  Modified:
-// 
+//
 //    04 March 2004
-// 
+//
 //  Author:
-// 
+//
 //    John Burkardt
 //
 //  References:
@@ -787,9 +787,9 @@ void bmp_header1_write ( ofstream &file_out, unsigned short int filetype,
 }
 //****************************************************************************
 
-void bmp_header2_print ( unsigned long int size, unsigned long int width, 
-  long int height, 
-  unsigned short int planes, unsigned short int bitsperpixel, 
+void bmp_header2_print ( unsigned long int size, unsigned long int width,
+  long int height,
+  unsigned short int planes, unsigned short int bitsperpixel,
   unsigned long int compression, unsigned long int sizeofbitmap,
   unsigned long int horzresolution, unsigned long int vertresolution,
   unsigned long int colorsused,  unsigned long int colorsimportant )
@@ -797,7 +797,7 @@ void bmp_header2_print ( unsigned long int size, unsigned long int width,
 //****************************************************************************
 //
 //  Purpose:
-// 
+//
 //    BMP_HEADER2_PRINT prints the bitmap header information of a BMP file.
 //
 //  Discussion:
@@ -805,12 +805,12 @@ void bmp_header2_print ( unsigned long int size, unsigned long int width,
 //    The bitmap header is 40 bytes long:
 //
 //    4 bytes SIZE;                Size of this header ( = 40 bytes).
-//    4 bytes WIDTH;               Image width, in pixels.   
-//    4 bytes HEIGHT;              Image height, in pixels.  
+//    4 bytes WIDTH;               Image width, in pixels.
+//    4 bytes HEIGHT;              Image height, in pixels.
 //                                 (Pos/Neg, origin at bottom, top)
 //    2 bytes PLANES;              Number of color planes (always 1).
 //    2 bytes BITSPERPIXEL;        1 to 24.  1, 4, 8, 16, 24 or 32.
-//    4 bytes COMPRESSION;         0, uncompressed; 1, 8 bit RLE; 
+//    4 bytes COMPRESSION;         0, uncompressed; 1, 8 bit RLE;
 //                                 2, 4 bit RLE; 3, bitfields.
 //    4 bytes SIZEOFBITMAP;        Size of bitmap in bytes. (0 if uncompressed).
 //    4 bytes HORZRESOLUTION;      Pixels per meter. (Can be zero)
@@ -819,11 +819,11 @@ void bmp_header2_print ( unsigned long int size, unsigned long int width,
 //    4 bytes COLORSIMPORTANT.     Minimum number of important colors. (Can be zero).
 //
 //  Modified:
-// 
+//
 //    06 March 2004
-// 
+//
 //  Author:
-// 
+//
 //    John Burkardt
 //
 //  References:
@@ -883,11 +883,11 @@ void bmp_header2_print ( unsigned long int size, unsigned long int width,
   cout << "    COLORSIMPORTANT = " << colorsimportant << "\n";
 
   return;
-} 
+}
 //****************************************************************************
 
 bool bmp_header2_read ( ifstream &file_in, unsigned long int *size,
-  unsigned long int *width, long int *height, 
+  unsigned long int *width, long int *height,
   unsigned short int *planes, unsigned short int *bitsperpixel,
   unsigned long int *compression, unsigned long int *sizeofbitmap,
   unsigned long int *horzresolution, unsigned long int *vertresolution,
@@ -896,7 +896,7 @@ bool bmp_header2_read ( ifstream &file_in, unsigned long int *size,
 //****************************************************************************
 //
 //  Purpose:
-// 
+//
 //    BMP_HEADER2_READ reads the bitmap header information of a BMP file.
 //
 //  Discussion:
@@ -904,12 +904,12 @@ bool bmp_header2_read ( ifstream &file_in, unsigned long int *size,
 //    The bitmap header is 40 bytes long:
 //
 //    4 bytes SIZE;                Size of this header, in bytes.
-//    4 bytes WIDTH;               Image width, in pixels.   
-//    4 bytes HEIGHT;              Image height, in pixels.  
+//    4 bytes WIDTH;               Image width, in pixels.
+//    4 bytes HEIGHT;              Image height, in pixels.
 //                                 (Pos/Neg, origin at bottom, top)
 //    2 bytes PLANES;              Number of color planes (always 1).
 //    2 bytes BITSPERPIXEL;        1 to 24.  1, 4, 8, 16, 24 or 32.
-//    4 bytes COMPRESSION;         0, uncompressed; 1, 8 bit RLE; 
+//    4 bytes COMPRESSION;         0, uncompressed; 1, 8 bit RLE;
 //                                 2, 4 bit RLE; 3, bitfields.
 //    4 bytes SIZEOFBITMAP;        Size of bitmap in bytes. (0 if uncompressed).
 //    4 bytes HORZRESOLUTION;      Pixels per meter. (Can be zero)
@@ -918,11 +918,11 @@ bool bmp_header2_read ( ifstream &file_in, unsigned long int *size,
 //    4 bytes COLORSIMPORTANT.     Minimum number of important colors. (Can be zero).
 //
 //  Modified:
-// 
+//
 //    03 March 2004
-// 
+//
 //  Author:
-// 
+//
 //    John Burkardt
 //
 //  References:
@@ -998,7 +998,7 @@ bool bmp_header2_read ( ifstream &file_in, unsigned long int *size,
 //
 //  Read PLANES, the number of color planes.
 //
-  error = u_short_int_read ( planes, file_in ); 
+  error = u_short_int_read ( planes, file_in );
   if ( error )
   {
     return error;
@@ -1066,7 +1066,7 @@ bool bmp_header2_read ( ifstream &file_in, unsigned long int *size,
 //****************************************************************************
 
 void bmp_header2_write ( ofstream &file_out, unsigned long int size,
-  unsigned long int width, long int height, 
+  unsigned long int width, long int height,
   unsigned short int planes, unsigned short int bitsperpixel,
   unsigned long int compression, unsigned long int sizeofbitmap,
   unsigned long int horzresolution, unsigned long int vertresolution,
@@ -1075,23 +1075,23 @@ void bmp_header2_write ( ofstream &file_out, unsigned long int size,
 //****************************************************************************
 //
 //  Purpose:
-// 
+//
 //    BMP_HEADER2_WRITE writes the bitmap header information to a BMP file.
 //
 //  Discussion:
 //
-//    Thanks to Mark Cave-Ayland, mca198@ecs.soton.ac.uk, for pointing out an 
+//    Thanks to Mark Cave-Ayland, mca198@ecs.soton.ac.uk, for pointing out an
 //    error which caused the code to write one too many long ints, 19 May 2001.
 //
 //    The bitmap header is 40 bytes long:
 //
 //    4 bytes SIZE;                Size of this header, in bytes.
-//    4 bytes WIDTH;               Image width, in pixels.   
-//    4 bytes HEIGHT;              Image height, in pixels.  
+//    4 bytes WIDTH;               Image width, in pixels.
+//    4 bytes HEIGHT;              Image height, in pixels.
 //                                 (Pos/Neg, origin at bottom, top)
 //    2 bytes PLANES;              Number of color planes (always 1).
 //    2 bytes BITSPERPIXEL;        1 to 24.  1, 4, 8, 16, 24 or 32.
-//    4 bytes COMPRESSION;         0, uncompressed; 1, 8 bit RLE; 
+//    4 bytes COMPRESSION;         0, uncompressed; 1, 8 bit RLE;
 //                                 2, 4 bit RLE; 3, bitfields.
 //    4 bytes SIZEOFBITMAP;        Size of bitmap in bytes. (0 if uncompressed).
 //    4 bytes HORZRESOLUTION;      Pixels per meter. (Can be zero)
@@ -1100,11 +1100,11 @@ void bmp_header2_write ( ofstream &file_out, unsigned long int size,
 //    4 bytes COLORSIMPORTANT.     Minimum number of important colors. (Can be zero).
 //
 //  Modified:
-// 
+//
 //    03 March 2004
-// 
+//
 //  Author:
-// 
+//
 //    John Burkardt
 //
 //  References:
@@ -1153,7 +1153,7 @@ void bmp_header2_write ( ofstream &file_out, unsigned long int size,
   u_long_int_write ( size, file_out );
   u_long_int_write ( width, file_out );
   long_int_write ( height, file_out );
-  u_short_int_write ( planes, file_out ); 
+  u_short_int_write ( planes, file_out );
   u_short_int_write ( bitsperpixel, file_out );
   u_long_int_write ( compression, file_out );
   u_long_int_write ( sizeofbitmap, file_out );
@@ -1166,22 +1166,22 @@ void bmp_header2_write ( ofstream &file_out, unsigned long int size,
 }
 //****************************************************************************
 
-void bmp_palette_print ( unsigned long int colorsused, 
+void bmp_palette_print ( unsigned long int colorsused,
   unsigned char *rparray, unsigned char *gparray, unsigned char *bparray,
   unsigned char *aparray )
 
 //****************************************************************************
 //
 //  Purpose:
-//  
+//
 //    BMP_PALETTE_PRINT prints the palette data in a BMP file.
-// 
+//
 //  Modified:
-// 
+//
 //    05 March 2004
 //
 //  Author:
-// 
+//
 //    John Burkardt
 //
 //  References:
@@ -1204,7 +1204,7 @@ void bmp_palette_print ( unsigned long int colorsused,
 //
 //    Input, unsigned long int COLORSUSED, the number of colors in the palette.
 //
-//    Input, unsigned char *RPARRAY, *GPARRAY, *BPARRAY, *APARRAY, pointers to the 
+//    Input, unsigned char *RPARRAY, *GPARRAY, *BPARRAY, *APARRAY, pointers to the
 //    red, green, blue and transparency palette arrays.
 //
 {
@@ -1253,26 +1253,26 @@ void bmp_palette_print ( unsigned long int colorsused,
 //****************************************************************************
 
 bool bmp_palette_read ( ifstream &file_in, unsigned long int colorsused,
-  unsigned char *rparray, unsigned char *gparray, unsigned char *bparray, 
+  unsigned char *rparray, unsigned char *gparray, unsigned char *bparray,
   unsigned char *aparray )
 
 //****************************************************************************
 //
 //  Purpose:
-// 
+//
 //    BMP_PALETTE_READ reads the palette information of a BMP file.
 //
 //  Discussion:
-// 
+//
 //    There are COLORSUSED colors listed.  For each color, the values of
 //    (B,G,R,A) are listed, where A is a quantity reserved for future use.
 //
 //  Modified:
-// 
+//
 //    05 March 2003
-// 
+//
 //  Author:
-// 
+//
 //    John Burkardt
 //
 //  References:
@@ -1297,7 +1297,7 @@ bool bmp_palette_read ( ifstream &file_in, unsigned long int colorsused,
 //
 //    Input, unsigned long int COLORSUSED, the number of colors in the palette.
 //
-//    Input, unsigned char *RPARRAY, *GPARRAY, *BPARRAY, *APARRAY pointers to the 
+//    Input, unsigned char *RPARRAY, *GPARRAY, *BPARRAY, *APARRAY pointers to the
 //    red, green, blue and transparency palette arrays.
 //
 //    Output, bool BMP_PALETTE_READ, is true if an error occurred.
@@ -1385,22 +1385,22 @@ bool bmp_palette_read ( ifstream &file_in, unsigned long int colorsused,
 }
 //****************************************************************************
 
-void bmp_palette_write ( ofstream &file_out, unsigned long int colorsused, 
+void bmp_palette_write ( ofstream &file_out, unsigned long int colorsused,
   unsigned char *rparray, unsigned char *gparray, unsigned char *bparray,
   unsigned char *aparray )
 
 //****************************************************************************
 //
 //  Purpose:
-//  
+//
 //    BMP_PALETTE_WRITE writes the palette data to the BMP file.
-// 
+//
 //  Modified:
-// 
+//
 //    04 March 2004
 //
 //  Author:
-// 
+//
 //    John Burkardt
 //
 //  References:
@@ -1425,7 +1425,7 @@ void bmp_palette_write ( ofstream &file_out, unsigned long int colorsused,
 //
 //    Input, unsigned long int COLORSUSED, the number of colors in the palette.
 //
-//    Input, unsigned char *RPARRAY, *GPARRAY, *BPARRAY, *APARRAY, pointers to the 
+//    Input, unsigned char *RPARRAY, *GPARRAY, *BPARRAY, *APARRAY, pointers to the
 //    red, green, blue and transparency palette arrays.
 //
 {
@@ -1534,7 +1534,7 @@ bool bmp_print_test ( char *file_in_name )
 //
   file_in.open ( file_in_name, ios::in | ios::binary );
 
-  if ( !file_in ) 
+  if ( !file_in )
   {
     error = true;
     cout << "\n";
@@ -1548,10 +1548,10 @@ bool bmp_print_test ( char *file_in_name )
 //
 //  Read header 1.
 //
-  error = bmp_header1_read ( file_in, &filetype, &filesize, &reserved1, 
+  error = bmp_header1_read ( file_in, &filetype, &filesize, &reserved1,
     &reserved2, &bitmapoffset );
 
-  if ( error ) 
+  if ( error )
   {
     cout << "\n";
     cout << "BMP_PRINT_TEST: Fatal error!\n";
@@ -1567,7 +1567,7 @@ bool bmp_print_test ( char *file_in_name )
     &bitsperpixel, &compression, &sizeofbitmap, &horzresolution,
     &vertresolution, &colorsused, &colorsimportant );
 
-  if ( error ) 
+  if ( error )
   {
     cout << "\n";
     cout << "BMP_PRINT_TEST: Fatal error!\n";
@@ -1576,7 +1576,7 @@ bool bmp_print_test ( char *file_in_name )
   }
 
   bmp_header2_print ( size, width, height, planes, bitsperpixel,
-    compression, sizeofbitmap, horzresolution, vertresolution, 
+    compression, sizeofbitmap, horzresolution, vertresolution,
     colorsused, colorsimportant );
 //
 //  Read the palette.
@@ -1591,7 +1591,7 @@ bool bmp_print_test ( char *file_in_name )
     error = bmp_palette_read ( file_in, colorsused, rparray, gparray,
       bparray, aparray );
 
-    if ( error ) 
+    if ( error )
     {
       cout << "\n";
       cout << "BMP_PRINT_TEST: Fatal error!\n";
@@ -1621,7 +1621,7 @@ bool bmp_print_test ( char *file_in_name )
   {
     error = bmp_08_data_read ( file_in, width, height, rarray );
 
-    if ( error ) 
+    if ( error )
     {
       cout << "\n";
       cout << "BMP_PRINT_TEST: Fatal error!\n";
@@ -1634,10 +1634,10 @@ bool bmp_print_test ( char *file_in_name )
   }
   else if ( bitsperpixel == 24 )
   {
-    error = bmp_24_data_read ( file_in, width, height, rarray, garray, 
+    error = bmp_24_data_read ( file_in, width, height, rarray, garray,
       barray );
 
-    if ( error ) 
+    if ( error )
     {
       cout << "\n";
       cout << "BMP_PRINT_TEST: Fatal error!\n";
@@ -1666,13 +1666,13 @@ bool bmp_print_test ( char *file_in_name )
 }
 //****************************************************************************
 
-bool bmp_read ( char *file_in_name, unsigned long int *width, long int *height, 
+bool bmp_read ( char *file_in_name, unsigned long int *width, long int *height,
   unsigned char **rarray, unsigned char **garray, unsigned char **barray )
 
 //****************************************************************************
 //
 //  Purpose:
-// 
+//
 //    BMP_READ reads the header and data of a BMP file.
 //
 //  Discussion:
@@ -1684,11 +1684,11 @@ bool bmp_read ( char *file_in_name, unsigned long int *width, long int *height,
 //    monochrome images (bitsperpixel = 8 ) and suggesting how to fix that.
 //
 //  Modified:
-// 
+//
 //    01 April 2005
 //
 //  Author:
-// 
+//
 //    John Burkardt
 //
 //  References:
@@ -1748,7 +1748,7 @@ bool bmp_read ( char *file_in_name, unsigned long int *width, long int *height,
 //
   file_in.open ( file_in_name, ios::in | ios::binary );
 
-  if ( !file_in ) 
+  if ( !file_in )
   {
     error = true;
     cout << "\n";
@@ -1759,10 +1759,10 @@ bool bmp_read ( char *file_in_name, unsigned long int *width, long int *height,
 //
 //  Read header 1.
 //
-  error = bmp_header1_read ( file_in, &filetype, &filesize, &reserved1, 
+  error = bmp_header1_read ( file_in, &filetype, &filesize, &reserved1,
     &reserved2, &bitmapoffset );
 
-  if ( error ) 
+  if ( error )
   {
     cout << "\n";
     cout << "BMP_READ: Fatal error!\n";
@@ -1781,8 +1781,8 @@ bool bmp_read ( char *file_in_name, unsigned long int *width, long int *height,
     cout << "  The file's internal magic number is not \"BM\".\n";
     cout << "  with the numeric value " << magic << "\n";
     cout << "\n";
-    cout << "  Instead, it is \"" 
-         << ( char ) ( filetype / 256 ) 
+    cout << "  Instead, it is \""
+         << ( char ) ( filetype / 256 )
          << ( char ) ( filetype % 256 )
          << "\".\n";
     cout << "  with the numeric value " << filetype << "\n";
@@ -1797,7 +1797,7 @@ bool bmp_read ( char *file_in_name, unsigned long int *width, long int *height,
     &bitsperpixel, &compression, &sizeofbitmap, &horzresolution,
     &vertresolution, &colorsused, &colorsimportant );
 
-  if ( error ) 
+  if ( error )
   {
     cout << "\n";
     cout << "BMP_READ: Fatal error!\n";
@@ -1817,7 +1817,7 @@ bool bmp_read ( char *file_in_name, unsigned long int *width, long int *height,
     error = bmp_palette_read ( file_in, colorsused, rparray, gparray,
       bparray, aparray );
 
-    if ( error ) 
+    if ( error )
     {
       cout << "\n";
       cout << "BMP_READ: Fatal error!\n";
@@ -1844,7 +1844,7 @@ bool bmp_read ( char *file_in_name, unsigned long int *width, long int *height,
   {
     error = bmp_08_data_read ( file_in, *width, *height, *rarray );
 
-    if ( error ) 
+    if ( error )
     {
       cout << "\n";
       cout << "BMP_READ: Fatal error!\n";
@@ -1857,10 +1857,10 @@ bool bmp_read ( char *file_in_name, unsigned long int *width, long int *height,
   }
   else if ( bitsperpixel == 24 )
   {
-    error = bmp_24_data_read ( file_in, *width, *height, *rarray, *garray, 
+    error = bmp_24_data_read ( file_in, *width, *height, *rarray, *garray,
       *barray );
 
-    if ( error ) 
+    if ( error )
     {
       cout << "\n";
       cout << "BMP_READ: Fatal error!\n";
@@ -1939,7 +1939,7 @@ bool bmp_read_test ( char *file_in_name )
 //
 //  Read the data from file.
 //
-  error = bmp_read ( file_in_name, &width, &height, &rarray, &garray, 
+  error = bmp_read ( file_in_name, &width, &height, &rarray, &garray,
     &barray );
 //
 //  Free the memory.
@@ -1971,19 +1971,19 @@ bool bmp_read_test ( char *file_in_name )
   return error;
 # undef VERBOSE
 }
-bool bmp_write ( char *file_out_name, unsigned long int width, long int height, 
+bool bmp_write ( char *file_out_name, unsigned long int width, long int height,
   unsigned char *rarray, unsigned char *garray, unsigned char *barray ) {
   return bmp_24_write( file_out_name, width, height, rarray, garray, barray);
 }
 //****************************************************************************
 
-bool bmp_08_write ( char *file_out_name, unsigned long int width, long int height, 
+bool bmp_08_write ( char *file_out_name, unsigned long int width, long int height,
   unsigned char *rarray )
 
 //****************************************************************************
 //
 //  Purpose:
-// 
+//
 //    BMP_08_WRITE writes the header and data for a monochrome BMP file.
 //
 //  Discussion:
@@ -1991,11 +1991,11 @@ bool bmp_08_write ( char *file_out_name, unsigned long int width, long int heigh
 //    XV seems to think the resulting BMP file is "unexpectedly truncated".
 //
 //  Modified:
-// 
+//
 //    02 April 2005
 //
 //  Author:
-// 
+//
 //    John Burkardt
 //
 //  References:
@@ -2081,7 +2081,7 @@ bool bmp_08_write ( char *file_out_name, unsigned long int width, long int heigh
   filesize = 54 + ( width + padding ) * abs ( height );
   bitmapoffset = 54;
 
-  bmp_header1_write ( file_out, filetype, filesize, reserved1, 
+  bmp_header1_write ( file_out, filetype, filesize, reserved1,
     reserved2, bitmapoffset );
 //
 //  Write header 2.
@@ -2095,13 +2095,13 @@ bool bmp_08_write ( char *file_out_name, unsigned long int width, long int heigh
   colorsused = 0;
   colorsimportant = 0;
 
-  bmp_header2_write ( file_out, size, width, height, planes, bitsperpixel, 
+  bmp_header2_write ( file_out, size, width, height, planes, bitsperpixel,
     compression, sizeofbitmap, horzresolution, vertresolution,
     colorsused, colorsimportant );
 //
 //  Write the palette.
 //
-  bmp_palette_write ( file_out, colorsused, rparray, gparray, bparray, 
+  bmp_palette_write ( file_out, colorsused, rparray, gparray, bparray,
     aparray );
 //
 //  Write the data.
@@ -2172,7 +2172,7 @@ bool bmp_08_write_test ( char *file_out_name )
 //
 //  Allocate the memory.
 //
-  numbytes = width * abs ( height ) * sizeof ( unsigned char );  
+  numbytes = width * abs ( height ) * sizeof ( unsigned char );
 
   rarray = new unsigned char[numbytes];
 //
@@ -2218,13 +2218,13 @@ bool bmp_08_write_test ( char *file_out_name )
 }
 //****************************************************************************
 
-bool bmp_24_write ( char *file_out_name, unsigned long int width, long int height, 
+bool bmp_24_write ( char *file_out_name, unsigned long int width, long int height,
   unsigned char *rarray, unsigned char *garray, unsigned char *barray )
 
 //****************************************************************************
 //
 //  Purpose:
-// 
+//
 //    BMP_24_WRITE writes the header and data for a BMP file using three colors.
 //
 //  Discussion
@@ -2239,11 +2239,11 @@ bool bmp_24_write ( char *file_out_name, unsigned long int width, long int heigh
 //    the binary option.
 //
 //  Modified:
-// 
+//
 //    02 April 2005
 //
 //  Author:
-// 
+//
 //    John Burkardt
 //
 //  References:
@@ -2330,7 +2330,7 @@ bool bmp_24_write ( char *file_out_name, unsigned long int width, long int heigh
   filesize = 54 + ( ( 3 * width ) + padding ) * abs ( height );
   bitmapoffset = 54;
 
-  bmp_header1_write ( file_out, filetype, filesize, reserved1, 
+  bmp_header1_write ( file_out, filetype, filesize, reserved1,
     reserved2, bitmapoffset );
 //
 //  Write header 2.
@@ -2344,13 +2344,13 @@ bool bmp_24_write ( char *file_out_name, unsigned long int width, long int heigh
   colorsused = 0;
   colorsimportant = 0;
 
-  bmp_header2_write ( file_out, size, width, height, planes, bitsperpixel, 
+  bmp_header2_write ( file_out, size, width, height, planes, bitsperpixel,
     compression, sizeofbitmap, horzresolution, vertresolution,
     colorsused, colorsimportant );
 //
 //  Write the palette.
 //
-  bmp_palette_write ( file_out, colorsused, rparray, gparray, bparray, 
+  bmp_palette_write ( file_out, colorsused, rparray, gparray, bparray,
     aparray );
 //
 //  Write the data.
@@ -2426,7 +2426,7 @@ bool bmp_24_write_test ( char *file_out_name )
 //
 //  Allocate the memory.
 //
-  numbytes = width * abs ( height ) * sizeof ( unsigned char );  
+  numbytes = width * abs ( height ) * sizeof ( unsigned char );
 
   rarray = new unsigned char[numbytes];
   garray = new unsigned char[numbytes];
@@ -2451,7 +2451,7 @@ bool bmp_24_write_test ( char *file_out_name )
         *indexg = 0;
         *indexb = 0;
       }
-      else if ( ( width - 1 ) * j + ( abs ( height ) - 1 ) * i <= 
+      else if ( ( width - 1 ) * j + ( abs ( height ) - 1 ) * i <=
         ( width - 1 ) * ( abs ( height ) - 1 ) )
       {
         *indexr = 0;
@@ -2506,7 +2506,7 @@ bool long_int_read ( long int *long_int_val, ifstream &file_in )
 //****************************************************************************
 //
 //  Purpose:
-// 
+//
 //    LONG_INT_READ reads a long int from a file.
 //
 //  Modified:
@@ -2557,7 +2557,7 @@ bool long_int_read ( long int *long_int_val, ifstream &file_in )
     }
   }
 
-  *long_int_val = ( long int ) 
+  *long_int_val = ( long int )
     ( u_short_int_val_hi << 16 ) | u_short_int_val_lo;
 
   return false;
@@ -2569,7 +2569,7 @@ void long_int_write ( long int long_int_val, ofstream &file_out )
 //****************************************************************************
 //
 //  Purpose:
-// 
+//
 //    LONG_INT_WRITE writes a long int to a file.
 //
 //  Modified:
@@ -2620,13 +2620,13 @@ void long_int_write ( long int long_int_val, ofstream &file_out )
 }
 //****************************************************************************
 
-bool u_long_int_read ( unsigned long int *u_long_int_val, 
+bool u_long_int_read ( unsigned long int *u_long_int_val,
   ifstream &file_in )
 
 //****************************************************************************
 //
 //  Purpose:
-// 
+//
 //    U_LONG_INT_READ reads an unsigned long int from a file.
 //
 //  Modified:
@@ -2689,13 +2689,13 @@ bool u_long_int_read ( unsigned long int *u_long_int_val,
 }
 //****************************************************************************
 
-void u_long_int_write ( unsigned long int u_long_int_val, 
+void u_long_int_write ( unsigned long int u_long_int_val,
   ofstream &file_out )
 
 //****************************************************************************
 //
 //  Purpose:
-// 
+//
 //    U_LONG_INT_WRITE writes an unsigned long int to a file.
 //
 //  Modified:
@@ -2734,13 +2734,13 @@ void u_long_int_write ( unsigned long int u_long_int_val,
 }
 //****************************************************************************
 
-bool u_short_int_read ( unsigned short int *u_short_int_val, 
+bool u_short_int_read ( unsigned short int *u_short_int_val,
   ifstream &file_in )
 
 //****************************************************************************
 //
 //  Purpose:
-// 
+//
 //    U_SHORT_INT_READ reads an unsigned short int from a file.
 //
 //  Modified:
@@ -2803,13 +2803,13 @@ bool u_short_int_read ( unsigned short int *u_short_int_val,
 }
 //****************************************************************************
 
-void u_short_int_write ( unsigned short int u_short_int_val, 
+void u_short_int_write ( unsigned short int u_short_int_val,
   ofstream &file_out )
 
 //****************************************************************************
 //
 //  Purpose:
-// 
+//
 //    U_SHORT_INT_WRITE writes an unsigned short int to a file.
 //
 //  Modified:
