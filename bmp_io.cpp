@@ -1973,7 +1973,7 @@ bool bmp_read_test ( char *file_in_name )
 }
 bool bmp_write ( char *file_out_name, unsigned long int width, long int height, 
   unsigned char *rarray, unsigned char *garray, unsigned char *barray ) {
-	return bmp_24_write( file_out_name, width, height, rarray, garray, barray);
+  return bmp_24_write( file_out_name, width, height, rarray, garray, barray);
 }
 //****************************************************************************
 
