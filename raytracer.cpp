@@ -252,10 +252,9 @@ void Raytracer::render( int width, int height, Point3D eye, Vector3D view,
       imagePlane[1] = (-double(height)/2 + 0.5 + i)/factor;
       imagePlane[2] = -1;
 
-      // TODO: Convert ray to world space and call
-      // shadeRay(ray) to generate pixel colour.
-
-      Ray3D ray;
+      Vector3D direction = imagePlane - origin;
+      direction = viewToWorld * direction;
+      Ray3D ray = Ray3D(origin, direction);
 
       Colour col = shadeRay(ray);
 
