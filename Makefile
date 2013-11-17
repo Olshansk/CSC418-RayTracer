@@ -10,6 +10,8 @@ clean:
 	-rm -f core *.o
 	-rm raytracer
 
+run:
+	./raytracer
 
-
-
+png: raytracer run
+	mogrify -format png *.bmp
