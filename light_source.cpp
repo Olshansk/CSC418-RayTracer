@@ -20,7 +20,7 @@ void PointLight::shade( Ray3D& ray ) {
 
   Vector3D normal = intersection.normal;
   Material mat = *intersection.mat;
-  
+
   Colour ambient = mat.ambient;
   Colour diffuse = mat.diffuse;
   Colour specular = mat.specular;
@@ -62,55 +62,3 @@ void PointLight::shade( Ray3D& ray ) {
   // before this function.
 
 }
-
-/*
-
-struct Material {
-  Material( Colour ambient, Colour diffuse, Colour specular, double exp ) :
-    ambient(ambient), diffuse(diffuse), specular(specular),
-    specular_exp(exp) {}
-
-  // Ambient components for Phong shading.
-  Colour ambient;
-  // Diffuse components for Phong shading.
-  Colour diffuse;
-  // Specular components for Phong shading.
-  Colour specular;
-  // Specular expoent.
-  double specular_exp;
-};
-
-struct Intersection {
-  // Location of intersection.
-  Point3D point;
-  // Normal at the intersection.
-  Vector3D normal;
-  // Material at the intersection.
-  Material* mat;
-  // Position of the intersection point on your ray.
-  // (i.e. point = ray.origin + t_value * ray.dir)
-  // This is used when you need to intersect multiply objects and
-  // only want to keep the nearest intersection.
-  double t_value;
-  // Set to true when no intersection has occured.
-  bool none;
-};
-
-// Ray structure.
-struct Ray3D {
-  Ray3D() {
-    intersection.none = true;
-  }
-  Ray3D( Point3D p, Vector3D v ) : origin(p), dir(v) {
-    intersection.none = true;
-  }
-  // Origin and direction of the ray.
-  Point3D origin;
-  Vector3D dir;
-  // Intersection status, should be computed by the intersection
-  // function.
-  Intersection intersection;
-  // Current colour of the ray, should be computed by the shading
-  // function.
-  Colour col;
-};*/
