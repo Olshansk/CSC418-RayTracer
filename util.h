@@ -62,6 +62,9 @@ Vector3D operator -(const Vector3D& u, const Vector3D& v);
 Vector3D operator -(const Vector3D& u);
 Point3D operator -(const Point3D& u, const Vector3D& v);
 Vector3D cross(const Vector3D& u, const Vector3D& v);
+double dot(const Vector3D& u, const Vector3D& v);
+double dot(const Point3D& u, const Point3D& v);
+double dot(const Point3D& u, const Vector3D& v);
 std::ostream& operator <<(std::ostream& o, const Point3D& p);
 std::ostream& operator <<(std::ostream& o, const Vector3D& v);
 
@@ -178,8 +181,3 @@ struct Ray3D {
   Colour col;
 };
 #endif
-
-
-
-
-

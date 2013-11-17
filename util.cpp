@@ -182,6 +182,21 @@ Vector3D cross(const Vector3D& u, const Vector3D& v)
   return u.cross(v);
 }
 
+double dot(const Vector3D& u, const Vector3D& v)
+{
+  return u[0]*v[0] + u[1]*v[1] + u[2]*v[2];
+}
+
+double dot(const Point3D& u, const Point3D& v)
+{
+  return u[0]*v[0] + u[1]*v[1] + u[2]*v[2];
+}
+
+double dot(const Point3D& u, const Vector3D& v)
+{
+  return u[0]*v[0] + u[1]*v[1] + u[2]*v[2];
+}
+
 std::ostream& operator <<(std::ostream& s, const Point3D& p)
 {
   return s << "p(" << p[0] << "," << p[1] << "," << p[2] << ")";
@@ -386,6 +401,3 @@ std::ostream& operator <<(std::ostream& os, const Matrix4x4& M) {
     << "[" << M[3][0] << " " << M[3][1] << " "
     << M[3][2] << " " << M[3][3] << "]";
 }
-
-
-
