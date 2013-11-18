@@ -12,53 +12,21 @@
 #include "light_source.h"
 
 void PointLight::shade( Ray3D& ray ) {
-
-  Vector3D* s = new Vector3D(1, 0, 0);
-  Vector3D* de = new Vector3D(1, 0, 0);
-
   Intersection intersection = ray.intersection;
-
+  Material* mat = intersection.mat;
   Vector3D normal = intersection.normal;
-  Material mat = *intersection.mat;
+  Vector3D incident_vec = ray.dir;
 
-  Colour ambient = mat.ambient;
-  Colour diffuse = mat.diffuse;
-  Colour specular = mat.specular;
-  double specular_exp = mat.specular_exp;
+  Vector3D s_vec = get_position() - intersection.point;
+  s_vec.normalize();
 
-  double r = 0;
-  double g = 0;
-  double b = 0;
+  Vector3D r_vec = incident_vec - 2.0 * (normal.dot(incident_vec)) * normal;
 
-  //diffuse (whats the vector from light source?)
-  double temp = fmax(0, dot(normal, *s));
-  r += ambient[0] * temp;
-  g += ambient[1] * temp;
-  b += ambient[2] * temp;
-  //specular
-  Vector3D m = 2*dot(normal, *s)*normal - *s;
-  temp = pow(fmax(0, dot(m, *de)), specular_exp);
-  r += diffuse[0] * temp;
-  g += diffuse[1] * temp;
-  b += diffuse[2] * temp;
-  //ambient
-  r += specular[0];
-  g += specular[1];
-  b += specular[2];
+  Colour col = ray.col;
+  col = col + (mat->ambient * _col_ambient);
+  col = col + fmax(0, normal.dot(s_vec)) * (mat->diffuse * _col_diffuse);
+  col = col + pow(fmax(0, -r_vec.dot(incident_vec)), mat->specular_exp) * (mat->specular * _col_specular);
 
-  r = fmax(r, 255);
-  g = fmax(g, 255);
-  b = fmax(b, 255);
-
-  Colour *colour = new Colour(r, g, b);
-
-  //ray.col = *colour;
-  // TODO: implement this function to fill in values for ray.col
-  // using phong shading.  Make sure your vectors are normalized, and
-  // clamp colour values to 1.0.
-  //
-  // It is assumed at this point that the intersection information in ray
-  // is available.  So be sure that traverseScene() is called on the ray
-  // before this function.
-
+  col.clamp();
+  ray.col = col;
 }

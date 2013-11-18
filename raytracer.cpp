@@ -13,6 +13,7 @@
 
 #include "raytracer.h"
 #include "bmp_io.h"
+#include "render_style.h"
 #include <cmath>
 #include <iostream>
 #include <cstdlib>
@@ -221,7 +222,9 @@ Colour Raytracer::shadeRay( Ray3D& ray ) {
   // Don't bother shading if the ray didn't hit
   // anything.
   if (!ray.intersection.none) {
-    computeShading(ray);
+    if (RenderStyle::rstyle == phong) {
+      computeShading(ray);
+    }
     col = ray.col;
   }
   // You'll want to call shadeRay recursively (with a different ray,
