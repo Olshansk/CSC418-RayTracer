@@ -57,6 +57,9 @@ struct SceneDagNode {
   SceneDagNode* next;
   SceneDagNode* parent;
   SceneDagNode* child;
+
+  // Color used when drawing the scene signature
+  Colour scene_sig_col;
 };
 
 class Raytracer {

@@ -18,6 +18,7 @@
 #include <iostream>
 #include <cstdlib>
 
+#define RANDOM ((double) rand() / (RAND_MAX))
 
 Raytracer::Raytracer() : _lightSource(NULL) {
   _root = new SceneDagNode();
@@ -33,7 +34,8 @@ SceneDagNode* Raytracer::addObject( SceneDagNode* parent,
   node->parent = parent;
   node->next = NULL;
   node->child = NULL;
-
+  Colour randomSceneSignatureColour = Colour(RANDOM, RANDOM, RANDOM);
+  node->scene_sig_col = randomSceneSignatureColour;
   // Add the object to the parent's child list, this means
   // whatever transformation applied to the parent will also
   // be applied to the child.
@@ -167,6 +169,9 @@ void Raytracer::traverseScene( SceneDagNode* node, Ray3D& ray ) {
     // Perform intersection.
     if (node->obj->intersect(ray, _worldToModel, _modelToWorld)) {
       ray.intersection.mat = node->mat;
+      if (RenderStyle::rstyle == SCENE_SIGNATURE) {
+        ray.col = node->scene_sig_col;
+      }
     }
   }
   // Traverse the children.
@@ -222,7 +227,7 @@ Colour Raytracer::shadeRay( Ray3D& ray ) {
   // Don't bother shading if the ray didn't hit
   // anything.
   if (!ray.intersection.none) {
-    if (RenderStyle::rstyle == phong) {
+    if (RenderStyle::rstyle == PHONG) {
       computeShading(ray);
     }
     col = ray.col;

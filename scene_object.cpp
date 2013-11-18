@@ -20,10 +20,6 @@
 bool UnitSquare::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
     const Matrix4x4& modelToWorld ) {
 
-  // Colors used for the scene signature
-  Colour* squareCol = new Colour(1, 0, 0);
-  Colour* backCol = new Colour(0.8, 0.8, 0.8);
-
   // Half oof the unit square's edge length
   double bound = 0.5;
 
@@ -54,13 +50,6 @@ bool UnitSquare::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
     ray.intersection.normal = modelToWorld*(*normal);
     ray.intersection.normal.normalize();
     ray.intersection.t_value = lambda;
-    if (RenderStyle::rstyle == scene_signature) {
-      ray.col = *squareCol;
-    }
-  } else {
-    if (RenderStyle::rstyle == scene_signature) {
-      ray.col = *backCol;
-    }
   }
 
   return intersectionInBounds;
@@ -72,10 +61,6 @@ bool UnitSphere::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
 
   // The sphere's radius
   double radius = 1;
-
-  // Colors used for the scene signature
-  Colour* circleCol = new Colour(0, 0, 1);
-  Colour* backCol = new Colour(0.8, 0.8, 0.8);
 
   // Transform ray into object space
   Point3D modelPoint = worldToModel*ray.origin;
@@ -91,16 +76,12 @@ bool UnitSphere::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
   // Find how close the intersection is
   if (d >= 0) {
     double lambda = - b / a;
+    double ld1, ld2;
+    ld1 = ld2 = 0;
     if (d > 0) {
-      double ld1 = lambda + sqrt(d)/a;
-      double ld2 = lambda - sqrt(d)/a;
-      if (ld1 < 0 && ld2 < 0) {
-        ray.intersection.none = true;
-        if (RenderStyle::rstyle == scene_signature) {
-          ray.col = *backCol;
-        }
-        return false;
-      } else if (ld1 > 0 && ld2 < 0) {
+      ld1 = lambda + sqrt(d)/a;
+      ld2 = lambda - sqrt(d)/a;
+      if (ld1 > 0 && ld2 < 0) {
         lambda = ld1;
       } else if (ld1 > ld2 && ld2 > 0){
         lambda = ld2;
@@ -110,7 +91,7 @@ bool UnitSphere::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
     }
 
     // If a closer intersection exists, ignore this one
-    if (ray.intersection.t_value < lambda && !ray.intersection.none) {
+    if ((ray.intersection.t_value < lambda && !ray.intersection.none) || (ld1 < 0 && ld2 < 0)) {
       return false;
     }
 
@@ -124,16 +105,6 @@ bool UnitSphere::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
     ray.intersection.t_value = lambda;
     normal->normalize();
     ray.intersection.normal = *normal;
-    if (RenderStyle::rstyle == scene_signature) {
-      ray.col = *circleCol;
-    }
-  } else {
-    // If no other intersection exsits
-    if (ray.intersection.none) {
-      if (RenderStyle::rstyle == scene_signature) {
-        ray.col = *backCol;
-      }
-    }
   }
 
   return didIntersect;
