@@ -253,12 +253,13 @@ void Raytracer::render( int width, int height, Point3D eye, Vector3D view,
 
       Vector3D direction = imagePlane - origin;
       direction = viewToWorld * direction;
+      direction.normalize();
       origin = viewToWorld * origin;
       Ray3D ray = Ray3D(origin, direction);
 
       Colour col = shadeRay(ray);
       int index = i*width+j;
-     
+
   	  _rbuffer[index] = int(col[0]*255);
   	  _gbuffer[index] = int(col[1]*255);
   	  _bbuffer[index] = int(col[2]*255);
