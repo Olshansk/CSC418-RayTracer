@@ -52,7 +52,7 @@ void PointLight::shade( Ray3D& ray ) {
 
   Colour *colour = new Colour(r, g, b);
 
-  ray.col = *colour;
+  //ray.col = *colour;
   // TODO: implement this function to fill in values for ray.col
   // using phong shading.  Make sure your vectors are normalized, and
   // clamp colour values to 1.0.

@@ -2,4 +2,5 @@
 raytracer
 *.bmp
 *.png
+.DS_STORE
 

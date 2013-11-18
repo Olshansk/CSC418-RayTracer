@@ -11,87 +11,129 @@
 #include <cmath>
 #include <iostream>
 #include "scene_object.h"
+#include "render_style.h"
 
+// Finds intersection for UnitSquare, which is
+// defined on the xy-plane, with vertices (0.5, 0.5, 0), 
+// (-0.5, 0.5, 0), (-0.5, -0.5, 0), (0.5, -0.5, 0), and normal
+// (0, 0, 1).
 bool UnitSquare::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
     const Matrix4x4& modelToWorld ) {
+
+  // Colors used for the scene signature
+  Colour* squareCol = new Colour(1, 0, 0);
+  Colour* backCol = new Colour(0.8, 0.8, 0.8);
+
+  // Half oof the unit square's edge length
   double bound = 0.5;
 
-  // HINT: Remember to first transform the ray into object space  
-  // to simplify the intersection test.
+  // Transform ray into object space
   Point3D modelPoint = worldToModel*ray.origin;
   Vector3D modelDirection = worldToModel*ray.dir;
   
-  // TODO: implement intersection code for UnitSquare, which is
-  // defined on the xy-plane, with vertices (0.5, 0.5, 0), 
-  // (-0.5, 0.5, 0), (-0.5, -0.5, 0), (0.5, -0.5, 0), and normal
-  // (0, 0, 1).
+  // The square's normal and a point on the square
   Vector3D* normal = new Vector3D(0, 0, 1);
-  Point3D* q1 = new Point3D(bound, bound, 0);
-  // Point3D* q2 = new Point3D(-bound, bound, 0);
-  // Point3D* q3 = new Point3D(-bound, -bound, 0);
-  // Point3D* q4 = new Point3D(bound, -bound, 0);
-
-  double lambda = dot(*q1 - ray.origin, *normal)/dot(ray.dir, *normal);
+  Point3D* q1 = new Point3D(0, 0, 0);
   
-  // Your goal here is to fill ray.intersection with correct values
-  // should an intersection occur.  This includes intersection.point, 
-  // intersection.normal, intersection.none, intersection.t_value. 
+  // Find how close the intersection is
+  double lambda = dot(*q1 - modelPoint, *normal)/dot(modelDirection, *normal);
 
+  // If a closer intersection exists, ignore this one
+  if (ray.intersection.t_value < lambda && !ray.intersection.none) {
+    return false;
+  }
+
+  // Find the intersection
   Point3D intersection = modelPoint + lambda*modelDirection;
-
   bool intersectionInBounds = intersection[0] >= -bound && intersection[0] <= bound && intersection[1] >= -bound && intersection[1] <= bound;
   
+  // Populate ray.intersection values
   ray.intersection.none = !intersectionInBounds;
-  
   if (intersectionInBounds) {
     ray.intersection.point = modelToWorld*intersection;
     ray.intersection.normal = modelToWorld*(*normal);
     ray.intersection.t_value = lambda;
+    if (RenderStyle::rstyle == scene_signature) {  
+      ray.col = *squareCol;
+    }
+  } else {
+    if (RenderStyle::rstyle == scene_signature) {
+      ray.col = *backCol;
+    }
   }
 
   return intersectionInBounds;
 }
 
+// Intersection code for UnitSphere, which is centred on the origin.  
 bool UnitSphere::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
     const Matrix4x4& modelToWorld ) {
-  // HINT: Remember to first transform the ray into object space  
-  // to simplify the intersection test.
+
+  // The sphere's radius
+  double radius = 1;
+
+  // Colors used for the scene signature
+  Colour* circleCol = new Colour(0, 0, 1);
+  Colour* backCol = new Colour(0.8, 0.8, 0.8);
+
+  // Transform ray into object space
   Point3D modelPoint = worldToModel*ray.origin;
   Vector3D modelDirection = worldToModel*ray.dir;
 
-  // TODO: implement intersection code for UnitSphere, which is centred 
-  // on the origin.  
-  double radius = 1;
-  double a = dot(ray.dir, ray.dir);
-  double b = dot(ray.origin, ray.dir);
-  double c = dot(ray.origin, ray.origin) - radius;
+  // Detemine if there is an intersection
+  double a = dot(modelDirection, modelDirection);
+  double b = dot(modelPoint, modelDirection);
+  double c = dot(modelPoint, modelPoint) - radius;
   double d = b * b - a * c;
-  
   double didIntersect = d >= 0;
-  ray.intersection.none = !didIntersect;
 
-  // Your goal here is to fill ray.intersection with correct values
-  // should an intersection occur.  This includes intersection.point, 
-  // intersection.normal, intersection.none, intersection.t_value.   
-  if (d>= 0) {
+  // Find how close the intersection is
+  if (d >= 0) {
     double lambda = - b / a;
     if (d > 0) {
-      double ld1 = - b / a + sqrt(d)/a;
-      double ld2 = - b / a - sqrt(d)/a;
-      if (ld1 > ld2) {
+      double ld1 = lambda + sqrt(d)/a;
+      double ld2 = lambda - sqrt(d)/a;
+      if (ld1 < 0 && ld2 < 0) {
+        ray.intersection.none = true;
+        if (RenderStyle::rstyle == scene_signature) {
+          ray.col = *backCol;
+        }
+        return false;
+      } else if (ld1 > 0 && ld2 < 0) {
         lambda = ld1;
-      } else {
+      } else if (ld1 > ld2 && ld2 > 0){
         lambda = ld2;
+      } else {
+        lambda = ld1;
       }
     }
 
+    // If a closer intersection exists, ignore this one
+    if (ray.intersection.t_value < lambda && !ray.intersection.none) {
+      return false;
+    }
+
+    // Find the intersection and associated normal
     Point3D intersection = modelPoint + lambda*modelDirection;
+    Vector3D* normal = new Vector3D(2 * intersection[0], 2 * intersection[1], 2 * intersection[2]);
+
+    // Populate ray.intersection values
+    ray.intersection.none = !didIntersect;
     ray.intersection.point = modelToWorld*intersection;
     ray.intersection.t_value = lambda;
-    Vector3D* normal = new Vector3D(2 * intersection[0], 2 * intersection[1], 2 * intersection[2]);
     normal->normalize();
     ray.intersection.normal = *normal;
-  } 
+    if (RenderStyle::rstyle == scene_signature) {
+      ray.col = *circleCol;
+    }
+  } else {
+    // If no other intersection exsits
+    if (ray.intersection.none) {
+      if (RenderStyle::rstyle == scene_signature) {
+        ray.col = *backCol;
+      }
+    }
+  }
   
   return didIntersect;
 }

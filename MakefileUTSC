@@ -50,7 +50,7 @@ PROGRAM           = raytracer
 CSRCS         =
 
 # Define all C++ source files here
-CPPSRCS       = raytracer.cpp util.cpp light_source.cpp scene_object.cpp bmp_io.cpp
+CPPSRCS       = raytracer.cpp util.cpp light_source.cpp scene_object.cpp bmp_io.cpp render_style.cpp
 
 ##############################################################################
 # Define additional rules that make should know about in order to compile our

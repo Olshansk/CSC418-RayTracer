@@ -17,6 +17,7 @@
 #include <iostream>
 #include <cstdlib>
 
+
 Raytracer::Raytracer() : _lightSource(NULL) {
   _root = new SceneDagNode();
 }
@@ -208,7 +209,7 @@ void Raytracer::initPixelBuffer() {
 }
 
 void Raytracer::flushPixelBuffer( char *file_name ) {
-  bmp_write( file_name, _scrWidth, _scrHeight, _rbuffer, _gbuffer, _bbuffer );
+  bmp_write( file_name, _scrWidth, _scrHeight, _rbuffer, _gbuffer, _bbuffer);
   delete _rbuffer;
   delete _gbuffer;
   delete _bbuffer;
@@ -217,14 +218,12 @@ void Raytracer::flushPixelBuffer( char *file_name ) {
 Colour Raytracer::shadeRay( Ray3D& ray ) {
   Colour col(0.0, 0.0, 0.0);
   traverseScene(_root, ray);
-
   // Don't bother shading if the ray didn't hit
   // anything.
   if (!ray.intersection.none) {
     computeShading(ray);
     col = ray.col;
   }
-
   // You'll want to call shadeRay recursively (with a different ray,
   // of course) here to implement reflection/refraction effects.
 
@@ -254,13 +253,15 @@ void Raytracer::render( int width, int height, Point3D eye, Vector3D view,
 
       Vector3D direction = imagePlane - origin;
       direction = viewToWorld * direction;
+      origin = viewToWorld * origin;
       Ray3D ray = Ray3D(origin, direction);
 
       Colour col = shadeRay(ray);
-
-      _rbuffer[i*width+j] = int(col[0]*255);
-      _gbuffer[i*width+j] = int(col[1]*255);
-      _bbuffer[i*width+j] = int(col[2]*255);
+      int index = i*width+j;
+     
+  	  _rbuffer[index] = int(col[0]*255);
+  	  _gbuffer[index] = int(col[1]*255);
+  	  _bbuffer[index] = int(col[2]*255);
     }
   }
 
