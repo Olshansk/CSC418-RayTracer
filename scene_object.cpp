@@ -14,7 +14,7 @@
 #include "render_style.h"
 
 // Finds intersection for UnitSquare, which is
-// defined on the xy-plane, with vertices (0.5, 0.5, 0), 
+// defined on the xy-plane, with vertices (0.5, 0.5, 0),
 // (-0.5, 0.5, 0), (-0.5, -0.5, 0), (0.5, -0.5, 0), and normal
 // (0, 0, 1).
 bool UnitSquare::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
@@ -30,11 +30,11 @@ bool UnitSquare::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
   // Transform ray into object space
   Point3D modelPoint = worldToModel*ray.origin;
   Vector3D modelDirection = worldToModel*ray.dir;
-  
+
   // The square's normal and a point on the square
   Vector3D* normal = new Vector3D(0, 0, 1);
   Point3D* q1 = new Point3D(0, 0, 0);
-  
+
   // Find how close the intersection is
   double lambda = dot(*q1 - modelPoint, *normal)/dot(modelDirection, *normal);
 
@@ -46,14 +46,14 @@ bool UnitSquare::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
   // Find the intersection
   Point3D intersection = modelPoint + lambda*modelDirection;
   bool intersectionInBounds = intersection[0] >= -bound && intersection[0] <= bound && intersection[1] >= -bound && intersection[1] <= bound;
-  
+
   // Populate ray.intersection values
   ray.intersection.none = !intersectionInBounds;
   if (intersectionInBounds) {
     ray.intersection.point = modelToWorld*intersection;
     ray.intersection.normal = modelToWorld*(*normal);
     ray.intersection.t_value = lambda;
-    if (RenderStyle::rstyle == scene_signature) {  
+    if (RenderStyle::rstyle == scene_signature) {
       ray.col = *squareCol;
     }
   } else {
@@ -65,7 +65,7 @@ bool UnitSquare::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
   return intersectionInBounds;
 }
 
-// Intersection code for UnitSphere, which is centred on the origin.  
+// Intersection code for UnitSphere, which is centred on the origin.
 bool UnitSphere::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
     const Matrix4x4& modelToWorld ) {
 
@@ -134,6 +134,6 @@ bool UnitSphere::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
       }
     }
   }
-  
+
   return didIntersect;
 }
