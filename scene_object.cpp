@@ -28,11 +28,11 @@ bool UnitSquare::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
   Vector3D modelDirection = worldToModel*ray.dir;
 
   // The square's normal and a point on the square
-  Vector3D* normal = new Vector3D(0, 0, 1);
-  Point3D* q1 = new Point3D(0, 0, 0);
+  Vector3D normal = Vector3D(0, 0, 1);
+  Point3D q1 = Point3D(0, 0, 0);
 
   // Find how close the intersection is
-  double lambda = dot(*q1 - modelPoint, *normal)/dot(modelDirection, *normal);
+  double lambda = dot(q1 - modelPoint, normal)/dot(modelDirection, normal);
 
   // If a closer intersection exists, ignore this one
   if (ray.intersection.t_value < lambda && !ray.intersection.none) {
@@ -47,7 +47,7 @@ bool UnitSquare::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
   ray.intersection.none = !intersectionInBounds;
   if (intersectionInBounds) {
     ray.intersection.point = modelToWorld*intersection;
-    ray.intersection.normal = modelToWorld*(*normal);
+    ray.intersection.normal = modelToWorld*(normal);
     ray.intersection.normal.normalize();
     ray.intersection.t_value = lambda;
   }
@@ -97,14 +97,14 @@ bool UnitSphere::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
 
     // Find the intersection and associated normal
     Point3D intersection = modelPoint + lambda*modelDirection;
-    Vector3D* normal = new Vector3D(2 * intersection[0], 2 * intersection[1], 2 * intersection[2]);
+    Vector3D normal = Vector3D(2 * intersection[0], 2 * intersection[1], 2 * intersection[2]);
 
     // Populate ray.intersection values
     ray.intersection.none = !didIntersect;
     ray.intersection.point = modelToWorld*intersection;
     ray.intersection.t_value = lambda;
-    normal->normalize();
-    ray.intersection.normal = *normal;
+    normal.normalize();
+    ray.intersection.normal = normal;
   }
 
   return didIntersect;
