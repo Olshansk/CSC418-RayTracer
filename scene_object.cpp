@@ -52,6 +52,7 @@ bool UnitSquare::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
   if (intersectionInBounds) {
     ray.intersection.point = modelToWorld*intersection;
     ray.intersection.normal = modelToWorld*(*normal);
+    ray.intersection.normal.normalize();
     ray.intersection.t_value = lambda;
     if (RenderStyle::rstyle == scene_signature) {
       ray.col = *squareCol;
