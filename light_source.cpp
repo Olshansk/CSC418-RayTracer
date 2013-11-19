@@ -10,6 +10,7 @@
 
 #include <cmath>
 #include "light_source.h"
+#include "render_style.h"
 
 void PointLight::shade( Ray3D& ray ) {
   Intersection intersection = ray.intersection;
@@ -25,7 +26,9 @@ void PointLight::shade( Ray3D& ray ) {
   Colour col = ray.col;
   col = col + (mat->ambient * _col_ambient);
   col = col + fmax(0, normal.dot(s_vec)) * (mat->diffuse * _col_diffuse);
-  col = col + pow(fmax(0, -r_vec.dot(incident_vec)), mat->specular_exp) * (mat->specular * _col_specular);
+  if (RenderStyle::rstyle != AMBIENT_DIFFUSE) {
+    col = col + pow(fmax(0, -r_vec.dot(incident_vec)), mat->specular_exp) * (mat->specular * _col_specular);
+  }
 
   col.clamp();
   ray.col = col;

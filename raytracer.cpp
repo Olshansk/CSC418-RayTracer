@@ -228,7 +228,7 @@ Colour Raytracer::shadeRay( Ray3D& ray ) {
   // Don't bother shading if the ray didn't hit
   // anything.
   if (!ray.intersection.none) {
-    if (RenderStyle::rstyle == PHONG) {
+    if (RenderStyle::rstyle == PHONG || RenderStyle::rstyle == AMBIENT_DIFFUSE) {
       computeShading(ray);
     }
     col = ray.col;
