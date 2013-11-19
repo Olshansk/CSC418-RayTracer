@@ -38,7 +38,6 @@ bool UnitSquare::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
   if ((ray.intersection.t_value < lambda && !ray.intersection.none) || (lambda < 0) || (ray.sceneObject && ray.sceneObject == this && lambda < LAMBDA_EPSILON)) {
     return false;
   }
-
   // Find the intersection
   Point3D intersection = modelPoint + lambda*modelDirection;
   bool intersectionInBounds = intersection[0] >= -bound && intersection[0] <= bound && intersection[1] >= -bound && intersection[1] <= bound;

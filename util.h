@@ -189,6 +189,7 @@ struct Intersection {
 
 // Ray structure.
 struct Ray3D {
+  static const int MAX_REFLECTION = 5;
   Ray3D() {
     intersection.none = true;
     reflectionNumber = 0;
