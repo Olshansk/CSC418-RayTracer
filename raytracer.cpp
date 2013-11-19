@@ -17,7 +17,7 @@
 #include <cmath>
 #include <iostream>
 #include <cstdlib>
-#include <string.h>
+#include <cstring>
 #include <stdbool.h>
 
 #define RANDOM ((double) rand() / (RAND_MAX))
