@@ -10,8 +10,16 @@ clean:
 	-rm -f core *.o
 	-rm raytracer
 
-run: raytracer
+scene-signature: raytracer
+	./raytracer --scene-signature
+
+ambient-diffuse: raytracer
+	./raytracer --ambient-diffuse
+
+phong: raytracer
 	./raytracer --phong
 
-png: run
+bmp: scene-signature ambient-diffuse phong
+
+png: bmp
 	mogrify -format png *.bmp

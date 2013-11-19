@@ -307,14 +307,20 @@ int main(int argc, char* argv[])
     height = atoi(argv[2]);
   }
 
+  char filename[20];
+  filename[0] = 0;
+
   // Handle command line arguments
   if (argc > 1) {
     if (strcmp(argv[1], "--scene-signature") == 0) {
       RenderStyle::rstyle = SCENE_SIGNATURE;
+      strcat(filename, "sig");
     } else if (strcmp(argv[1], "--ambient-diffuse") == 0) {
       RenderStyle::rstyle = AMBIENT_DIFFUSE;
+      strcat(filename, "diffuse");
     } else if (strcmp(argv[1], "--phong") == 0) {
       RenderStyle::rstyle = PHONG;
+      strcat(filename, "phong");
     } else {
       printUsage();
       return 0;
@@ -360,12 +366,12 @@ int main(int argc, char* argv[])
 
   // Render the scene, feel free to make the image smaller for
   // testing purposes.
-  raytracer.render(width, height, eye, view, up, fov, (char *) "view1.bmp");
+  raytracer.render(width, height, eye, view, up, fov, strcat(strdup(filename), "1.bmp"));
 
   // Render it from a different point of view.
   Point3D eye2(4, 2, 1);
   Vector3D view2(-4, -2, -6);
-  raytracer.render(width, height, eye2, view2, up, fov, (char *) "view2.bmp");
+  raytracer.render(width, height, eye2, view2, up, fov, strcat(strdup(filename), "2.bmp"));
 
   return 0;
 }
