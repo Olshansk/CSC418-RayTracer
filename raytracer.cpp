@@ -18,6 +18,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <string.h>
+#include <stdbool.h>
 
 #define RANDOM ((double) rand() / (RAND_MAX))
 
@@ -280,7 +281,7 @@ void Raytracer::render( int width, int height, Point3D eye, Vector3D view,
 
 void printUsage() {
   printf(
-    "Usage: raytracer [options]\n"
+    "Usage: raytracer [width] [height] [options]\n"
     "\n"
     "Options:\n"
     "--help                   print this message\n"
@@ -288,7 +289,19 @@ void printUsage() {
     "--ambient-diffuse        render a scene with only the diffuse and ambient\n"
     "                         components of the Phong model\n"
     "--phong                  render a scene with all three terms of the Phong model\n"
+    "\n"
+    "You must use one of the 3 rendering modes.\n"
   );
+}
+
+bool contains_option(int argc, char* argv[], const char* option) {
+  for (int x = 0; x < argc; x++) {
+    if (strcmp(argv[x], option) == 0) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 int main(int argc, char* argv[])
@@ -302,7 +315,7 @@ int main(int argc, char* argv[])
   int width = 320;
   int height = 240;
 
-  if (argc == 3) {
+  if (argc >= 3) {
     width = atoi(argv[1]);
     height = atoi(argv[2]);
   }
@@ -312,13 +325,13 @@ int main(int argc, char* argv[])
 
   // Handle command line arguments
   if (argc > 1) {
-    if (strcmp(argv[1], "--scene-signature") == 0) {
+    if (contains_option(argc, argv, "--scene-signature")) {
       RenderStyle::rstyle = SCENE_SIGNATURE;
       strcat(filename, "sig");
-    } else if (strcmp(argv[1], "--ambient-diffuse") == 0) {
+    } else if (contains_option(argc, argv, "--ambient-diffuse")) {
       RenderStyle::rstyle = AMBIENT_DIFFUSE;
       strcat(filename, "diffuse");
-    } else if (strcmp(argv[1], "--phong") == 0) {
+    } else if (contains_option(argc, argv, "--phong")) {
       RenderStyle::rstyle = PHONG;
       strcat(filename, "phong");
     } else {
