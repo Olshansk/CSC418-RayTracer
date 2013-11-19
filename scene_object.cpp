@@ -35,10 +35,9 @@ bool UnitSquare::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
   double lambda = dot(q1 - modelPoint, normal)/dot(modelDirection, normal);
 
   // If a closer intersection exists, ignore this one
-  if (ray.intersection.t_value < lambda && !ray.intersection.none) {
+  if ((ray.intersection.t_value < lambda && !ray.intersection.none) || (lambda < 0) || (ray.sceneObject && ray.sceneObject == this) ) {
     return false;
   }
-
   // Find the intersection
   Point3D intersection = modelPoint + lambda*modelDirection;
   bool intersectionInBounds = intersection[0] >= -bound && intersection[0] <= bound && intersection[1] >= -bound && intersection[1] <= bound;
@@ -50,6 +49,7 @@ bool UnitSquare::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
     ray.intersection.normal.normalize();
     ray.intersection.t_value = lambda;
     ray.intersection.none = false;
+    ray.intersection.sceneObject = this;
   }
 
   return intersectionInBounds;
@@ -90,8 +90,7 @@ bool UnitSphere::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
       }
     }
 
-    // If a closer intersection exists, ignore this one
-    if ((ray.intersection.t_value < lambda && !ray.intersection.none) || (ld1 < 0 && ld2 < 0)) {
+    if ((ray.intersection.t_value < lambda && !ray.intersection.none) || (ld1 < 0 && ld2 < 0) || (lambda < 0) || (ray.sceneObject && ray.sceneObject == this)) {
       return false;
     }
 
@@ -106,6 +105,7 @@ bool UnitSphere::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
     normal = transNorm(worldToModel, normal);
     normal.normalize();
     ray.intersection.normal = normal;
+    ray.intersection.sceneObject = this;
   }
 
   return didIntersect;

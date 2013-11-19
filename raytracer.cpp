@@ -195,15 +195,36 @@ void Raytracer::traverseScene( SceneDagNode* node, Ray3D& ray, Matrix4x4 modelTo
   modelToWorld = modelToWorld*node->invtrans;
 }
 
+Colour Raytracer::reflectionColor( Ray3D& ray ) {
+  Ray3D reflectionRay = LightSource::getReflectionRay(ray);
+  return shadeRay(reflectionRay);
+}
+
+bool Raytracer::isIntersectionInShadow( Ray3D& ray, LightSource* light ) {
+    Ray3D shadowRay = light->getShadowRay(ray);
+    traverseScene(_root, shadowRay, Matrix4x4(), Matrix4x4());
+    return (!shadowRay.intersection.none && shadowRay.intersection.t_value > 0 && shadowRay.intersection.t_value <= 1);
+}
+
+// Potentiall TODO: Normalize t_value somehow.
+void Raytracer::applyReflection( Ray3D& ray ) {
+    if (ray.reflectionNumber < Ray3D::MAX_REFLECTION) {
+      Colour reflectionColour = reflectionColor(ray);
+      ray.col = ray.col + ray.intersection.mat->reflection * exp (- ray.intersection.mat->ref_damping * ray.intersection.t_value) * reflectionColour;
+      ray.col.clamp();
+    }
+}
+
 void Raytracer::computeShading( Ray3D& ray ) {
   LightListNode* curLight = _lightSource;
   for (;;) {
     if (curLight == NULL) break;
     // Each lightSource provides its own shading function.
 
-    // Implement shadows here if needed.
+    // Appply secondary reflection
+    applyReflection(ray);
 
-    curLight->light->shade(ray);
+    curLight->light->shade(ray, isIntersectionInShadow(ray, curLight->light));
     curLight = curLight->next;
   }
 }
@@ -504,16 +525,16 @@ int main(int argc, char* argv[])
   // Defines a material for shading.
   Material gold( Colour(0.3, 0.3, 0.3), Colour(0.75164, 0.60648, 0.22648),
       Colour(0.628281, 0.555802, 0.366065),
-      51.2 );
+      51.2, 0.3, 0.2);
   Material ruby( Colour(0.1745, 0.01175, 0.01175), Colour(0.61424, 0.04136, 0.04136),
       Colour(0.727811, 0.626959, 0.626959),
-      51.2 );
+      51.2, 0, 0 );
   Material emerald( Colour(0.0215, 0.1745, 0.0215), Colour(0.07568, 0.61424, 0.07568),
       Colour(0.633, 0.727811, 0.633),
-      51.2 );
+      51.2, 0, 0 );
   Material jade( Colour(0, 0, 0), Colour(0.54, 0.89, 0.63),
       Colour(0.316228, 0.316228, 0.316228),
-      12.8 );
+      12.8, 0.3, 0.2 );
 
   if (scene_num == 1) {
     // Camera parameters.
@@ -594,4 +615,3 @@ int main(int argc, char* argv[])
 
   return 0;
 }
-

@@ -141,6 +141,16 @@ private:
   // the object space of each node where intersection is performed.
   void traverseScene( SceneDagNode* node, Ray3D& ray, Matrix4x4 modelToWorld, Matrix4x4 worldToModel);
 
+  // Used to implement recursive illumination by spawning a new ray
+  // upon the collision of a former ray with an object
+  Colour reflectionColor( Ray3D& ray );
+
+  // Applies a reflection effect to the current colour if necessary
+  void applyReflection( Ray3D& ray );
+
+  // Determine if the intersection of the ray is located in a shadow relative to that light source
+  bool isIntersectionInShadow( Ray3D& ray, LightSource* light );
+
   // After intersection, calculate the colour of the ray by shading it
   // with all light sources in the scene.
   void computeShading( Ray3D& ray );
