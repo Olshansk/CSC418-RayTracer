@@ -111,6 +111,10 @@ private:
   // Saves the pixel buffer to a file and deletes the buffer.
   void flushPixelBuffer(char *file_name);
 
+  // Return the colour of a ray given by the origin and the point on the
+  // plane to shade
+  Colour shadeViewRay(Matrix4x4 viewToWorld, Point3D imagePlane, Point3D origin);
+
   // Return the colour of the ray after intersection and shading, call
   // this function recursively for reflection and refraction.
   Colour shadeRay( Ray3D& ray );

@@ -11,6 +11,10 @@
 #include <cmath>
 #include "util.h"
 
+double d_rand() {
+    return (double)rand() / (double)RAND_MAX ;
+}
+
 Point3D::Point3D() {
   m_data[0] = 0.0;
   m_data[1] = 0.0;

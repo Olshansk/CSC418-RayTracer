@@ -21,6 +21,7 @@
 #include <stdbool.h>
 
 #define RANDOM ((double) rand() / (RAND_MAX))
+#define ANTIALIAS_RAYS 16
 
 Raytracer::Raytracer() : _lightSource(NULL) {
   _root = new SceneDagNode();
@@ -240,6 +241,16 @@ Colour Raytracer::shadeRay( Ray3D& ray ) {
   return col;
 }
 
+Colour Raytracer::shadeViewRay(Matrix4x4 viewToWorld, Point3D imagePlane, Point3D origin) {
+  Vector3D direction = imagePlane - origin;
+  direction = viewToWorld * direction;
+  direction.normalize();
+  origin = viewToWorld * origin;
+  Ray3D ray = Ray3D(origin, direction);
+
+  return shadeRay(ray);
+}
+
 void Raytracer::render( int width, int height, Point3D eye, Vector3D view,
     Vector3D up, double fov, char* fileName ) {
   Matrix4x4 viewToWorld;
@@ -255,19 +266,25 @@ void Raytracer::render( int width, int height, Point3D eye, Vector3D view,
     for (int j = 0; j < _scrWidth; j++) {
       // Sets up ray origin and direction in view space,
       // image plane is at z = -1.
+
       Point3D origin(0, 0, 0);
-      Point3D imagePlane;
-      imagePlane[0] = (-double(width)/2 + 0.5 + j)/factor;
-      imagePlane[1] = (-double(height)/2 + 0.5 + i)/factor;
-      imagePlane[2] = -1;
+      Point3D imagePlaneOrig, imagePlane;
+      imagePlaneOrig[0] = (-double(width)/2 + j)/factor;
+      imagePlaneOrig[1] = (-double(height)/2 + i)/factor;
+      imagePlaneOrig[2] = -1;
 
-      Vector3D direction = imagePlane - origin;
-      direction = viewToWorld * direction;
-      direction.normalize();
-      origin = viewToWorld * origin;
-      Ray3D ray = Ray3D(origin, direction);
+      imagePlane[2] = imagePlaneOrig[2];
 
-      Colour col = shadeRay(ray);
+      Colour col = Colour();
+      for (int k = 0; k < ANTIALIAS_RAYS; k++) {
+        imagePlane[0] = imagePlaneOrig[0] + d_rand() / factor;
+        imagePlane[1] = imagePlaneOrig[1] + d_rand() / factor;
+
+        col = col + shadeViewRay(viewToWorld, imagePlane, origin);
+      }
+
+      col = (1.0 / ANTIALIAS_RAYS) * col;
+
       int index = i*width+j;
 
   	  _rbuffer[index] = int(col[0]*255);
