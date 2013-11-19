@@ -3,8 +3,7 @@ CFLAGS = -g -O2
 LIBS = -lm
 
 raytracer:  raytracer.o util.o light_source.o scene_object.o bmp_io.o render_style.o
-	$(CC) $(CFLAGS) -o raytracer \
-	raytracer.o util.o light_source.o scene_object.o bmp_io.o render_style.o $(LIBS)
+	$(CC) $(CFLAGS) -o raytracer $^ $(LIBS)
 
 clean:
 	-rm -f core *.o
