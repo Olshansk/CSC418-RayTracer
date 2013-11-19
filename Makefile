@@ -11,7 +11,7 @@ clean:
 	-rm raytracer
 
 run: raytracer
-	./raytracer
+	./raytracer --phong
 
 png: run
 	mogrify -format png *.bmp

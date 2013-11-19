@@ -17,6 +17,7 @@
 #include <cmath>
 #include <iostream>
 #include <cstdlib>
+#include <string.h>
 
 #define RANDOM ((double) rand() / (RAND_MAX))
 
@@ -277,6 +278,19 @@ void Raytracer::render( int width, int height, Point3D eye, Vector3D view,
   flushPixelBuffer(fileName);
 }
 
+void printUsage() {
+  printf(
+    "Usage: raytracer [options]\n"
+    "\n"
+    "Options:\n"
+    "--help                   print this message\n"
+    "--scene-signature        render a scene signature\n"
+    "--ambient-diffuse        render a scene with only the diffuse and ambient\n"
+    "                         components of the Phong model\n"
+    "--phong                  render a scene with all three terms of the Phong model\n"
+  );
+}
+
 int main(int argc, char* argv[])
 {
   // Build your scene and setup your camera here, by calling
@@ -291,6 +305,23 @@ int main(int argc, char* argv[])
   if (argc == 3) {
     width = atoi(argv[1]);
     height = atoi(argv[2]);
+  }
+
+  // Handle command line arguments
+  if (argc > 1) {
+    if (strcmp(argv[1], "--scene-signature") == 0) {
+      RenderStyle::rstyle = SCENE_SIGNATURE;
+    } else if (strcmp(argv[1], "--ambient-diffuse") == 0) {
+      RenderStyle::rstyle = AMBIENT_DIFFUSE;
+    } else if (strcmp(argv[1], "--phong") == 0) {
+      RenderStyle::rstyle = PHONG;
+    } else {
+      printUsage();
+      return 0;
+    }
+  } else {
+    printUsage();
+    return 0;
   }
 
   // Camera parameters.
