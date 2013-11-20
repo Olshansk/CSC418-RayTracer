@@ -21,7 +21,7 @@ void PointLight::shade( Ray3D& ray ) {
   Vector3D s_vec = get_position() - intersection.point;
   s_vec.normalize();
 
-  Vector3D r_vec = incident_vec - 2.0 * (normal.dot(incident_vec)) * normal;
+  Vector3D r_vec = 2.0 * (normal.dot(s_vec)) * normal - s_vec;
 
   Colour col = ray.col;
   col = col + (mat->ambient * _col_ambient);
