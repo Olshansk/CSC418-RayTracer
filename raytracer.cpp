@@ -323,6 +323,11 @@ int main(int argc, char* argv[])
   char filename[20];
   filename[0] = 0;
 
+  if (contains_option(argc, argv, "--help")) {
+    printUsage();
+    return 0;
+  }
+
   // Handle command line arguments
   if (argc > 1) {
     if (contains_option(argc, argv, "--scene-signature")) {
