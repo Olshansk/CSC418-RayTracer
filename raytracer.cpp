@@ -18,13 +18,13 @@
 #include <iostream>
 #include <cstdlib>
 #include <cstring>
-#include <stdbool.h>
 
 #define RANDOM ((double) rand() / (RAND_MAX))
-#define ANTIALIAS_RAYS 16
 
 Raytracer::Raytracer() : _lightSource(NULL) {
   _root = new SceneDagNode();
+  antialias = false;
+  antialias_rays = 0;
 }
 
 Raytracer::~Raytracer() {
@@ -276,14 +276,20 @@ void Raytracer::render( int width, int height, Point3D eye, Vector3D view,
       imagePlane[2] = imagePlaneOrig[2];
 
       Colour col = Colour();
-      for (int k = 0; k < ANTIALIAS_RAYS; k++) {
-        imagePlane[0] = imagePlaneOrig[0] + d_rand() / factor;
-        imagePlane[1] = imagePlaneOrig[1] + d_rand() / factor;
+      if (antialias) {
+        for (int k = 0; k < antialias_rays; k++) {
+          imagePlane[0] = imagePlaneOrig[0] + d_rand() / factor;
+          imagePlane[1] = imagePlaneOrig[1] + d_rand() / factor;
 
+          col = col + shadeViewRay(viewToWorld, imagePlane, origin);
+        }
+
+        col = (1.0 / antialias_rays) * col;
+      } else {
+        imagePlane[0] = imagePlaneOrig[0] + 0.5 / factor;
+        imagePlane[1] = imagePlaneOrig[1] + 0.5 / factor;
         col = col + shadeViewRay(viewToWorld, imagePlane, origin);
       }
-
-      col = (1.0 / ANTIALIAS_RAYS) * col;
 
       int index = i*width+j;
 
@@ -310,6 +316,7 @@ void printUsage() {
     "\n"
     "--width 320\n"
     "--height 240\n"
+    "--antialias 4\n"
   );
 }
 
@@ -370,6 +377,12 @@ int main(int argc, char* argv[])
   } else {
     printUsage();
     return 0;
+  }
+
+  int antialias_arg = contains_option(argc, argv, "--antialias");
+  if (antialias_arg > 0) {
+    raytracer.antialias = true;
+    raytracer.antialias_rays = atoi(argv[antialias_arg + 1]);
   }
 
   // Camera parameters.

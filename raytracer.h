@@ -14,6 +14,7 @@
 #include "util.h"
 #include "scene_object.h"
 #include "light_source.h"
+#include <stdbool.h>
 
 // Linked list containing light sources in the scene.
 struct LightListNode {
@@ -101,6 +102,9 @@ public:
 
   // Apply scaling about a fixed point origin.
   void scale( SceneDagNode* node, Point3D origin, double factor[3] );
+
+  bool antialias;
+  int antialias_rays;
 
 private:
   // Allocates and initializes the pixel buffer for rendering, you
