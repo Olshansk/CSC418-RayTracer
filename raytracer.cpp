@@ -294,14 +294,14 @@ void printUsage() {
   );
 }
 
-bool contains_option(int argc, char* argv[], const char* option) {
+int contains_option(int argc, char* argv[], const char* option) {
   for (int x = 0; x < argc; x++) {
     if (strcmp(argv[x], option) == 0) {
-      return true;
+      return x;
     }
   }
 
-  return false;
+  return -1;
 }
 
 int main(int argc, char* argv[])
@@ -323,20 +323,20 @@ int main(int argc, char* argv[])
   char filename[20];
   filename[0] = 0;
 
-  if (contains_option(argc, argv, "--help")) {
+  if (contains_option(argc, argv, "--help") > 0) {
     printUsage();
     return 0;
   }
 
   // Handle command line arguments
   if (argc > 1) {
-    if (contains_option(argc, argv, "--scene-signature")) {
+    if (contains_option(argc, argv, "--scene-signature") > 0) {
       RenderStyle::rstyle = SCENE_SIGNATURE;
       strcat(filename, "sig");
-    } else if (contains_option(argc, argv, "--ambient-diffuse")) {
+    } else if (contains_option(argc, argv, "--ambient-diffuse") > 0) {
       RenderStyle::rstyle = AMBIENT_DIFFUSE;
       strcat(filename, "diffuse");
-    } else if (contains_option(argc, argv, "--phong")) {
+    } else if (contains_option(argc, argv, "--phong") > 0) {
       RenderStyle::rstyle = PHONG;
       strcat(filename, "phong");
     } else {
