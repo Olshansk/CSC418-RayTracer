@@ -281,7 +281,7 @@ void Raytracer::render( int width, int height, Point3D eye, Vector3D view,
 
 void printUsage() {
   printf(
-    "Usage: raytracer [width] [height] [options]\n"
+    "Usage: raytracer [options]\n"
     "\n"
     "Options:\n"
     "--help                   print this message\n"
@@ -289,8 +289,10 @@ void printUsage() {
     "--ambient-diffuse        render a scene with only the diffuse and ambient\n"
     "                         components of the Phong model\n"
     "--phong                  render a scene with all three terms of the Phong model\n"
+    "    You must use one of the 3 rendering modes.\n"
     "\n"
-    "You must use one of the 3 rendering modes.\n"
+    "--width 320\n"
+    "--height 240\n"
   );
 }
 
@@ -315,9 +317,14 @@ int main(int argc, char* argv[])
   int width = 320;
   int height = 240;
 
-  if (argc >= 3) {
-    width = atoi(argv[1]);
-    height = atoi(argv[2]);
+  int width_arg = contains_option(argc, argv, "--width");
+  if (width_arg > 0) {
+    width = atoi(argv[width_arg + 1]);
+  }
+
+  int height_arg = contains_option(argc, argv, "--height");
+  if (height_arg > 0) {
+    height = atoi(argv[height_arg + 1]);
   }
 
   char filename[20];
