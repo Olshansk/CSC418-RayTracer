@@ -161,16 +161,16 @@ Matrix4x4 Raytracer::initInvViewMatrix( Point3D eye, Vector3D view,
   return mat;
 }
 
-void Raytracer::traverseScene( SceneDagNode* node, Ray3D& ray ) {
+void Raytracer::traverseScene( SceneDagNode* node, Ray3D& ray, Matrix4x4 modelToWorld, Matrix4x4 worldToModel) {
   SceneDagNode *childPtr;
 
   // Applies transformation of the current node to the global
   // transformation matrices.
-  _modelToWorld = _modelToWorld*node->trans;
-  _worldToModel = node->invtrans*_worldToModel;
+  modelToWorld = modelToWorld*node->trans;
+  worldToModel = node->invtrans*worldToModel;
   if (node->obj) {
     // Perform intersection.
-    if (node->obj->intersect(ray, _worldToModel, _modelToWorld)) {
+    if (node->obj->intersect(ray, worldToModel, modelToWorld)) {
       ray.intersection.mat = node->mat;
       if (RenderStyle::rstyle == SCENE_SIGNATURE) {
         ray.col = node->scene_sig_col;
@@ -180,14 +180,14 @@ void Raytracer::traverseScene( SceneDagNode* node, Ray3D& ray ) {
   // Traverse the children.
   childPtr = node->child;
   while (childPtr != NULL) {
-    traverseScene(childPtr, ray);
+    traverseScene(childPtr, ray, modelToWorld, worldToModel);
     childPtr = childPtr->next;
   }
 
   // Removes transformation of the current node from the global
   // transformation matrices.
-  _worldToModel = node->trans*_worldToModel;
-  _modelToWorld = _modelToWorld*node->invtrans;
+  worldToModel = node->trans*worldToModel;
+  modelToWorld = modelToWorld*node->invtrans;
 }
 
 void Raytracer::computeShading( Ray3D& ray ) {
@@ -226,7 +226,7 @@ void Raytracer::flushPixelBuffer( char *file_name ) {
 
 Colour Raytracer::shadeRay( Ray3D& ray ) {
   Colour col(0.0, 0.0, 0.0);
-  traverseScene(_root, ray);
+  traverseScene(_root, ray, Matrix4x4(), Matrix4x4());
   // Don't bother shading if the ray didn't hit
   // anything.
   if (!ray.intersection.none) {
@@ -262,6 +262,7 @@ void Raytracer::render( int width, int height, Point3D eye, Vector3D view,
   viewToWorld = initInvViewMatrix(eye, view, up);
 
   // Construct a ray for each pixel.
+  #pragma omp parallel for
   for (int i = 0; i < _scrHeight; i++) {
     for (int j = 0; j < _scrWidth; j++) {
       // Sets up ray origin and direction in view space,
@@ -293,9 +294,9 @@ void Raytracer::render( int width, int height, Point3D eye, Vector3D view,
 
       int index = i*width+j;
 
-  	  _rbuffer[index] = int(col[0]*255);
-  	  _gbuffer[index] = int(col[1]*255);
-  	  _bbuffer[index] = int(col[2]*255);
+      _rbuffer[index] = int(col[0]*255);
+      _gbuffer[index] = int(col[1]*255);
+      _bbuffer[index] = int(col[2]*255);
     }
   }
 

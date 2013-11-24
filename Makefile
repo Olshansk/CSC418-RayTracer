@@ -1,5 +1,6 @@
 CC = g++
-CFLAGS = -g -O2
+CXX = $(CC) -fopenmp
+CFLAGS = -O3 -fopenmp
 LIBS = -lm
 
 raytracer:  raytracer.o util.o light_source.o scene_object.o bmp_io.o render_style.o

@@ -129,7 +129,7 @@ private:
 
   // Traversal code for the scene graph, the ray is transformed into
   // the object space of each node where intersection is performed.
-  void traverseScene( SceneDagNode* node, Ray3D& ray );
+  void traverseScene( SceneDagNode* node, Ray3D& ray, Matrix4x4 modelToWorld, Matrix4x4 worldToModel);
 
   // After intersection, calculate the colour of the ray by shading it
   // with all light sources in the scene.
@@ -147,9 +147,4 @@ private:
   unsigned char* _rbuffer;
   unsigned char* _gbuffer;
   unsigned char* _bbuffer;
-
-  // Maintain global transformation matrices similar to OpenGL's matrix
-  // stack.  These are used during scene traversal.
-  Matrix4x4 _modelToWorld;
-  Matrix4x4 _worldToModel;
 };

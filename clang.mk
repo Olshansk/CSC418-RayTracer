@@ -5,4 +5,3 @@ include Makefile
 # Use this file at your own peril.
 
 CC = clang++
-CXX = clang++
