@@ -329,9 +329,9 @@ void printUsage() {
     "    You must use one of the 3 rendering modes.\n"
     "\n"
     "--scene 1                     pick which scene to render"
-    "--width 320\n"
-    "--height 240\n"
-    "--antialias 4\n"
+    "--width 320                   width of image to render\n"
+    "--height 240                  height of image to render\n"
+    "--antialias 4                 # rays to use for antialias subsampling\n"
   );
 }
 
@@ -359,11 +359,13 @@ int main(int argc, char* argv[])
   int width_arg = contains_option(argc, argv, "--width");
   if (width_arg > 0) {
     width = atoi(argv[width_arg + 1]);
+    printf("Rendering image of width %dpx.\n", width);
   }
 
   int height_arg = contains_option(argc, argv, "--height");
   if (height_arg > 0) {
     height = atoi(argv[height_arg + 1]);
+    printf("Rendering image of height %dpx.\n", height);
   }
 
   if (contains_option(argc, argv, "--help") > 0) {
@@ -375,10 +377,13 @@ int main(int argc, char* argv[])
   if (argc > 1) {
     if (contains_option(argc, argv, "--scene-signature") > 0) {
       RenderStyle::rstyle = SCENE_SIGNATURE;
+      printf("Rendering only scene signature.\n");
     } else if (contains_option(argc, argv, "--ambient-diffuse") > 0) {
       RenderStyle::rstyle = AMBIENT_DIFFUSE;
+      printf("Rendering ambiant and diffuse light modelled image.\n");
     } else if (contains_option(argc, argv, "--phong") > 0) {
       RenderStyle::rstyle = PHONG;
+      printf("Rendering phong light modelled image.\n");
     } else {
       printUsage();
       return 0;
@@ -392,16 +397,20 @@ int main(int argc, char* argv[])
   if (antialias_arg > 0) {
     raytracer.antialias = true;
     raytracer.antialias_rays = atoi(argv[antialias_arg + 1]);
+    printf("Using %d antialiasing rays.\n", raytracer.antialias_rays);
   }
 
   int scene_num_arg = contains_option(argc, argv, "--scene");
   int scene_num;
   if (scene_num_arg > 0) {
     scene_num = atoi(argv[scene_num_arg + 1]);
+    printf("Rendering scene #%d.\n", scene_num);
   } else {
     printUsage();
     return 0;
   }
+
+  printf("\n");
 
   // Defines a material for shading.
   Material gold( Colour(0.3, 0.3, 0.3), Colour(0.75164, 0.60648, 0.22648),
