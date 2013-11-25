@@ -20,7 +20,6 @@
 #include <cstring>
 #include <sstream>
 
-#define RANDOM ((double) rand() / (RAND_MAX))
 #define ADAPTIVE_SUBSAMPLING_THRESHOLD 0.01
 
 Raytracer::Raytracer() : _lightSource(NULL) {
@@ -257,8 +256,8 @@ Colour Raytracer::subsampleRay(Point3D imagePlaneOrig, Point3D imagePlane, doubl
       Matrix4x4 viewToWorld, Point3D origin) {
   Colour col = Colour();
   for (int k = 0; k < antialias_rays; k++) {
-    imagePlane[0] = imagePlaneOrig[0] + d_rand() / factor;
-    imagePlane[1] = imagePlaneOrig[1] + d_rand() / factor;
+    imagePlane[0] = imagePlaneOrig[0] + RANDOM / factor;
+    imagePlane[1] = imagePlaneOrig[1] + RANDOM / factor;
 
     col = col + shadeViewRay(viewToWorld, imagePlane, origin);
   }

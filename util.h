@@ -21,7 +21,7 @@
 #define M_PI  3.14159265358979323846
 #endif
 
-double d_rand();
+#define RANDOM ((double) rand() / (RAND_MAX))
 
 class Point3D {
 public:
