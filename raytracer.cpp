@@ -21,6 +21,7 @@
 #include <sstream>
 
 #define RANDOM ((double) rand() / (RAND_MAX))
+#define ADAPTIVE_SUBSAMPLING_THRESHOLD 0.01
 
 Raytracer::Raytracer() : _lightSource(NULL) {
   _root = new SceneDagNode();
@@ -252,6 +253,19 @@ Colour Raytracer::shadeViewRay(Matrix4x4 viewToWorld, Point3D imagePlane, Point3
   return shadeRay(ray);
 }
 
+Colour Raytracer::subsampleRay(Point3D imagePlaneOrig, Point3D imagePlane, double factor,
+      Matrix4x4 viewToWorld, Point3D origin) {
+  Colour col = Colour();
+  for (int k = 0; k < antialias_rays; k++) {
+    imagePlane[0] = imagePlaneOrig[0] + d_rand() / factor;
+    imagePlane[1] = imagePlaneOrig[1] + d_rand() / factor;
+
+    col = col + shadeViewRay(viewToWorld, imagePlane, origin);
+  }
+
+  return col;
+}
+
 void Raytracer::render( int width, int height, Point3D eye, Vector3D view,
     Vector3D up, double fov, int scene_num ) {
   Matrix4x4 viewToWorld;
@@ -279,20 +293,48 @@ void Raytracer::render( int width, int height, Point3D eye, Vector3D view,
 
       imagePlane[2] = imagePlaneOrig[2];
 
-      Colour col = Colour();
+      Colour col;
       if (antialias) {
-        for (int k = 0; k < antialias_rays; k++) {
-          imagePlane[0] = imagePlaneOrig[0] + d_rand() / factor;
-          imagePlane[1] = imagePlaneOrig[1] + d_rand() / factor;
+        if (antialias_rays > 4) {
+          // Bottom left pixel
+          imagePlane[0] = imagePlaneOrig[0];
+          imagePlane[1] = imagePlaneOrig[1];
+          Colour col1 = shadeViewRay(viewToWorld, imagePlane, origin);
 
-          col = col + shadeViewRay(viewToWorld, imagePlane, origin);
+          // Bottom right pixel
+          imagePlane[0] = imagePlaneOrig[0] + 1.0 / factor;
+          Colour col2 = shadeViewRay(viewToWorld, imagePlane, origin);
+
+          // Top right pixel
+          imagePlane[1] = imagePlaneOrig[1] + 1.0 / factor;
+          Colour col3 = shadeViewRay(viewToWorld, imagePlane, origin);
+
+          // Top left pixel
+          imagePlane[0] = imagePlaneOrig[0];
+          Colour col4 = shadeViewRay(viewToWorld, imagePlane, origin);
+
+          // Check if any of the corner pixels are substantially different than each other
+          float threshold = ADAPTIVE_SUBSAMPLING_THRESHOLD;
+          bool cornersDifferent =
+              colourDiff(col1, col2, threshold) || colourDiff(col1, col3, threshold) ||
+              colourDiff(col1, col4, threshold) || colourDiff(col2, col3, threshold) ||
+              colourDiff(col2, col4, threshold) || colourDiff(col3, col4, threshold);
+
+          if (cornersDifferent) {
+            col = subsampleRay(imagePlaneOrig, imagePlane, factor, viewToWorld, origin);
+            col = col + col1 + col2 + col3 + col4;
+            col = (1.0 / (antialias_rays + 4)) * col;
+          } else {
+            col = (1.0 / 4.0) * (col1 + col2 + col3 + col4);
+          }
+        } else {
+          col = subsampleRay(imagePlaneOrig, imagePlane, factor, viewToWorld, origin);
+          col = (1.0 / antialias_rays) * col;
         }
-
-        col = (1.0 / antialias_rays) * col;
       } else {
         imagePlane[0] = imagePlaneOrig[0] + 0.5 / factor;
         imagePlane[1] = imagePlaneOrig[1] + 0.5 / factor;
-        col = col + shadeViewRay(viewToWorld, imagePlane, origin);
+        col = shadeViewRay(viewToWorld, imagePlane, origin);
       }
 
       int index = i*width+j;

@@ -266,6 +266,20 @@ Colour operator +(const Colour& u, const Colour& v)
   return Colour(u[0]+v[0], u[1]+v[1], u[2]+v[2]);
 }
 
+Colour operator -(const Colour& u, const Colour& v)
+{
+  return Colour(u[0]-v[0], u[1]-v[1], u[2]-v[2]);
+}
+
+bool operator >(const Colour& u, double d) {
+  return u[0] > d || u[1] > d || u[2] > d;
+}
+
+bool colourDiff(const Colour& u, const Colour&v, double threshold) {
+  Colour u_v = u - v;
+  return u_v * u_v > threshold;
+}
+
 std::ostream& operator <<(std::ostream& s, const Colour& c)
 {
   return s << "c(" << c[0] << "," << c[1] << "," << c[2] << ")";

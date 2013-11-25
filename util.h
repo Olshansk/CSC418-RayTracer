@@ -132,6 +132,9 @@ private:
 
 Colour operator *(double s, const Colour& c);
 Colour operator +(const Colour& u, const Colour& v);
+Colour operator -(const Colour& u, const Colour& v);
+bool operator >(const Colour& u, double d);
+bool colourDiff(const Colour& u, const Colour&v, double threshold);
 std::ostream& operator <<(std::ostream& o, const Colour& c);
 
 struct Material {
