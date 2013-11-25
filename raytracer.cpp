@@ -261,6 +261,8 @@ void Raytracer::render( int width, int height, Point3D eye, Vector3D view,
   initPixelBuffer();
   viewToWorld = initInvViewMatrix(eye, view, up);
 
+  int rows_completed = 0;
+
   // Construct a ray for each pixel.
   #pragma omp parallel for
   for (int i = 0; i < _scrHeight; i++) {
@@ -297,6 +299,14 @@ void Raytracer::render( int width, int height, Point3D eye, Vector3D view,
       _rbuffer[index] = int(col[0]*255);
       _gbuffer[index] = int(col[1]*255);
       _bbuffer[index] = int(col[2]*255);
+    }
+
+    #pragma omp critical
+    {
+      rows_completed++;
+      if (rows_completed % 10 == 0) {
+        printf("Rows completed: %d\n", rows_completed);
+      }
     }
   }
 
