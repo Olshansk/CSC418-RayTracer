@@ -18,6 +18,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <cstring>
+#include <sstream>
 
 #define RANDOM ((double) rand() / (RAND_MAX))
 
@@ -252,7 +253,7 @@ Colour Raytracer::shadeViewRay(Matrix4x4 viewToWorld, Point3D imagePlane, Point3
 }
 
 void Raytracer::render( int width, int height, Point3D eye, Vector3D view,
-    Vector3D up, double fov, char* fileName ) {
+    Vector3D up, double fov, int scene_num ) {
   Matrix4x4 viewToWorld;
   _scrWidth = width;
   _scrHeight = height;
@@ -310,7 +311,9 @@ void Raytracer::render( int width, int height, Point3D eye, Vector3D view,
     }
   }
 
-  flushPixelBuffer(fileName);
+  std::stringstream sstm;
+  sstm << "scene" << scene_num << ".bmp";
+  flushPixelBuffer(strdup(sstm.str().c_str()));
 }
 
 void printUsage() {
@@ -325,6 +328,7 @@ void printUsage() {
     "--phong                  render a scene with all three terms of the Phong model\n"
     "    You must use one of the 3 rendering modes.\n"
     "\n"
+    "--scene 1                     pick which scene to render"
     "--width 320\n"
     "--height 240\n"
     "--antialias 4\n"
@@ -362,9 +366,6 @@ int main(int argc, char* argv[])
     height = atoi(argv[height_arg + 1]);
   }
 
-  char filename[20];
-  filename[0] = 0;
-
   if (contains_option(argc, argv, "--help") > 0) {
     printUsage();
     return 0;
@@ -374,13 +375,10 @@ int main(int argc, char* argv[])
   if (argc > 1) {
     if (contains_option(argc, argv, "--scene-signature") > 0) {
       RenderStyle::rstyle = SCENE_SIGNATURE;
-      strcat(filename, "sig");
     } else if (contains_option(argc, argv, "--ambient-diffuse") > 0) {
       RenderStyle::rstyle = AMBIENT_DIFFUSE;
-      strcat(filename, "diffuse");
     } else if (contains_option(argc, argv, "--phong") > 0) {
       RenderStyle::rstyle = PHONG;
-      strcat(filename, "phong");
     } else {
       printUsage();
       return 0;
@@ -396,48 +394,105 @@ int main(int argc, char* argv[])
     raytracer.antialias_rays = atoi(argv[antialias_arg + 1]);
   }
 
-  // Camera parameters.
-  Point3D eye(0, 0, 1);
-  Vector3D view(0, 0, -1);
-  Vector3D up(0, 1, 0);
-  double fov = 60;
+  int scene_num_arg = contains_option(argc, argv, "--scene");
+  int scene_num;
+  if (scene_num_arg > 0) {
+    scene_num = atoi(argv[scene_num_arg + 1]);
+  } else {
+    printUsage();
+    return 0;
+  }
 
   // Defines a material for shading.
   Material gold( Colour(0.3, 0.3, 0.3), Colour(0.75164, 0.60648, 0.22648),
       Colour(0.628281, 0.555802, 0.366065),
       51.2 );
+  Material ruby( Colour(0.1745, 0.01175, 0.01175), Colour(0.61424, 0.04136, 0.04136),
+      Colour(0.727811, 0.626959, 0.626959),
+      51.2 );
+  Material emerald( Colour(0.0215, 0.1745, 0.0215), Colour(0.07568, 0.61424, 0.07568),
+      Colour(0.633, 0.727811, 0.633),
+      51.2 );
   Material jade( Colour(0, 0, 0), Colour(0.54, 0.89, 0.63),
       Colour(0.316228, 0.316228, 0.316228),
       12.8 );
 
-  // Defines a point light source.
-  raytracer.addLightSource( new PointLight(Point3D(0, 0, 5),
-        Colour(0.9, 0.9, 0.9) ) );
+  if (scene_num == 1) {
+    // Camera parameters.
+    Point3D eye(0, 0, 1);
+    Vector3D view(0, 0, -1);
+    Vector3D up(0, 1, 0);
+    double fov = 60;
 
-  // Add a unit square into the scene with material mat.
-  SceneDagNode* sphere = raytracer.addObject( new UnitSphere(), &gold );
-  SceneDagNode* plane = raytracer.addObject( new UnitSquare(), &jade );
+    // Defines a point light source.
+    raytracer.addLightSource( new PointLight(Point3D(0, 0, 5),
+          Colour(0.9, 0.9, 0.9) ) );
 
-  // Apply some transformations to the unit square.
-  double factor1[3] = { 1.0, 2.0, 1.0 };
-  double factor2[3] = { 6.0, 6.0, 6.0 };
-  raytracer.translate(sphere, Vector3D(0, 0, -5));
-  raytracer.rotate(sphere, 'x', -45);
-  raytracer.rotate(sphere, 'z', 45);
-  raytracer.scale(sphere, Point3D(0, 0, 0), factor1);
+    // Add a unit square into the scene with material mat.
+    SceneDagNode* sphere = raytracer.addObject( new UnitSphere(), &gold );
+    SceneDagNode* plane = raytracer.addObject( new UnitSquare(), &jade );
 
-  raytracer.translate(plane, Vector3D(0, 0, -7));
-  raytracer.rotate(plane, 'z', 45);
-  raytracer.scale(plane, Point3D(0, 0, 0), factor2);
+    // Apply some transformations to the unit square.
+    double factor1[3] = { 1.0, 2.0, 1.0 };
+    double factor2[3] = { 6.0, 6.0, 6.0 };
+    raytracer.translate(sphere, Vector3D(0, 0, -5));
+    raytracer.rotate(sphere, 'x', -45);
+    raytracer.rotate(sphere, 'z', 45);
+    raytracer.scale(sphere, Point3D(0, 0, 0), factor1);
 
-  // Render the scene, feel free to make the image smaller for
-  // testing purposes.
-  raytracer.render(width, height, eye, view, up, fov, strcat(strdup(filename), "1.bmp"));
+    raytracer.translate(plane, Vector3D(0, 0, -7));
+    raytracer.rotate(plane, 'z', 45);
+    raytracer.scale(plane, Point3D(0, 0, 0), factor2);
 
-  // Render it from a different point of view.
-  Point3D eye2(4, 2, 1);
-  Vector3D view2(-4, -2, -6);
-  raytracer.render(width, height, eye2, view2, up, fov, strcat(strdup(filename), "2.bmp"));
+    // Render the scene
+    raytracer.render(width, height, eye, view, up, fov, scene_num);
+  } else if (scene_num == 2) {
+    // Render it from a different point of view.
+    Point3D eye(4, 2, 1);
+    Vector3D view(-4, -2, -6);
+    Vector3D up(0, 1, 0);
+    double fov = 60;
+
+    // Defines a point light source.
+    raytracer.addLightSource( new PointLight(Point3D(0, 0, 5),
+          Colour(0.9, 0.9, 0.9) ) );
+
+    // Add a unit square into the scene with material mat.
+    SceneDagNode* sphere = raytracer.addObject( new UnitSphere(), &gold );
+    SceneDagNode* plane = raytracer.addObject( new UnitSquare(), &jade );
+
+    // Apply some transformations to the unit square.
+    double factor1[3] = { 1.0, 2.0, 1.0 };
+    double factor2[3] = { 6.0, 6.0, 6.0 };
+    raytracer.translate(sphere, Vector3D(0, 0, -5));
+    raytracer.rotate(sphere, 'x', -45);
+    raytracer.rotate(sphere, 'z', 45);
+    raytracer.scale(sphere, Point3D(0, 0, 0), factor1);
+
+    raytracer.translate(plane, Vector3D(0, 0, -7));
+    raytracer.rotate(plane, 'z', 45);
+    raytracer.scale(plane, Point3D(0, 0, 0), factor2);
+    raytracer.render(width, height, eye, view, up, fov, scene_num);
+  } else if (scene_num == 3) {
+    Point3D eye(0, 1, 1);
+    Vector3D view(0, 0, -1);
+    Vector3D up(0, 1, 0);
+    double fov = 60;
+
+    raytracer.addLightSource( new PointLight(Point3D(-5, 5, 5),
+          Colour(0.9, 0.9, 0.9) ) );
+
+    SceneDagNode* sphere1 = raytracer.addObject( new UnitSphere(), &ruby );
+    SceneDagNode* sphere2 = raytracer.addObject( new UnitSphere(), &emerald );
+    SceneDagNode* sphere3 = raytracer.addObject( new UnitSphere(), &gold );
+
+    raytracer.translate(sphere1, Vector3D(0, 0, -5));
+    raytracer.translate(sphere2, Vector3D(3.2, 0, -11));
+    raytracer.translate(sphere3, Vector3D(-3.2, 0, -8));
+
+    // Render the scene
+    raytracer.render(width, height, eye, view, up, fov, scene_num);
+  }
 
   return 0;
 }

@@ -72,7 +72,7 @@ public:
   // positioned at eye, with view vector view, up vector up, and
   // field of view fov.
   void render( int width, int height, Point3D eye, Vector3D view,
-      Vector3D up, double fov, char* fileName );
+      Vector3D up, double fov, int scene_num );
 
   // Add an object into the scene, with material mat.  The function
   // returns a handle to the object node you just added, use the
