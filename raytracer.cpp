@@ -26,6 +26,10 @@ Raytracer::Raytracer() : _lightSource(NULL) {
   _root = new SceneDagNode();
   antialias = false;
   antialias_rays = 0;
+  depth_of_field = false;
+  depth_of_field_rays = 0;
+  depth_of_field_aperature = 0;
+  depth_of_field_focus_plane = 1.0;
 }
 
 Raytracer::~Raytracer() {
@@ -242,14 +246,26 @@ Colour Raytracer::shadeRay( Ray3D& ray ) {
   return col;
 }
 
-Colour Raytracer::shadeViewRay(Matrix4x4 viewToWorld, Point3D imagePlane, Point3D origin) {
+Colour Raytracer::shadeSingleViewRay(Matrix4x4 viewToWorld, Point3D imagePlane, Point3D origin) {
   Vector3D direction = imagePlane - origin;
   direction = viewToWorld * direction;
   direction.normalize();
   origin = viewToWorld * origin;
   Ray3D ray = Ray3D(origin, direction);
-
   return shadeRay(ray);
+}
+
+Colour Raytracer::shadeViewRay(Matrix4x4 viewToWorld, Point3D imagePlane, Point3D origin) {
+  if (depth_of_field) {
+    Colour col = Colour();
+    for (int m = 0; m < depth_of_field_rays; m++) {
+      Point3D origin = Point3D((RANDOM - 0.5) * depth_of_field_aperature, (RANDOM - 0.5) * depth_of_field_aperature, 0);
+      col = col + shadeSingleViewRay(viewToWorld, imagePlane, origin);
+    }
+    return (1.0 / depth_of_field_rays) * col;
+  } else {
+    return shadeSingleViewRay(viewToWorld, imagePlane, origin);
+  }
 }
 
 Colour Raytracer::subsampleRay(Point3D imagePlaneOrig, Point3D imagePlane, double factor,
@@ -270,7 +286,7 @@ void Raytracer::render( int width, int height, Point3D eye, Vector3D view,
   Matrix4x4 viewToWorld;
   _scrWidth = width;
   _scrHeight = height;
-  double factor = (double(height)/2)/tan(fov*M_PI/360.0);
+  double factor = (double(height / depth_of_field_focus_plane)/2)/tan(fov*M_PI/360.0);
 
   initPixelBuffer();
   viewToWorld = initInvViewMatrix(eye, view, up);
@@ -288,7 +304,7 @@ void Raytracer::render( int width, int height, Point3D eye, Vector3D view,
       Point3D imagePlaneOrig, imagePlane;
       imagePlaneOrig[0] = (-double(width)/2 + j)/factor;
       imagePlaneOrig[1] = (-double(height)/2 + i)/factor;
-      imagePlaneOrig[2] = -1;
+      imagePlaneOrig[2] = -depth_of_field_focus_plane;
 
       imagePlane[2] = imagePlaneOrig[2];
 
@@ -362,17 +378,18 @@ void printUsage() {
     "Usage: raytracer [options]\n"
     "\n"
     "Options:\n"
-    "--help                   print this message\n"
-    "--scene-signature        render a scene signature\n"
-    "--ambient-diffuse        render a scene with only the diffuse and ambient\n"
-    "                         components of the Phong model\n"
-    "--phong                  render a scene with all three terms of the Phong model\n"
+    "--help                        print this message\n"
+    "--scene-signature             render a scene signature\n"
+    "--ambient-diffuse             render a scene with only the diffuse and ambient\n"
+    "                              components of the Phong model\n"
+    "--phong                       render a scene with all three terms of the Phong model\n"
     "    You must use one of the 3 rendering modes.\n"
     "\n"
     "--scene 1                     pick which scene to render"
     "--width 320                   width of image to render\n"
     "--height 240                  height of image to render\n"
-    "--antialias 4                 # rays to use for antialias subsampling\n"
+    "--antialias 4                 number of rays to use for antialias subsampling\n"
+    "--depth-of-field 60 0.05 1    number of rays, aperature size (bigger the blurier), focal plane distance\n"
   );
 }
 
@@ -439,6 +456,17 @@ int main(int argc, char* argv[])
     raytracer.antialias = true;
     raytracer.antialias_rays = atoi(argv[antialias_arg + 1]);
     printf("Using %d antialiasing rays.\n", raytracer.antialias_rays);
+  }
+
+  int depth_of_field_arg = contains_option(argc, argv, "--depth-of-field");
+  if (depth_of_field_arg > 0) {
+    raytracer.depth_of_field = true;
+    raytracer.depth_of_field_rays = atoi(argv[depth_of_field_arg + 1]);
+    raytracer.depth_of_field_aperature = atof(argv[depth_of_field_arg + 2]);
+    raytracer.depth_of_field_focus_plane = atof(argv[depth_of_field_arg + 3]);
+    printf("Using %d depth of field rays.\n", raytracer.depth_of_field_rays);
+    printf("Using %f aperature size.\n", raytracer.depth_of_field_aperature);
+    printf("Using focus plane %f units away from origin.\n", raytracer.depth_of_field_focus_plane);
   }
 
   int scene_num_arg = contains_option(argc, argv, "--scene");

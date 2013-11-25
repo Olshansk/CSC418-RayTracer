@@ -106,6 +106,11 @@ public:
   bool antialias;
   int antialias_rays;
 
+  bool depth_of_field;
+  int depth_of_field_rays;
+  float depth_of_field_aperature;
+  float depth_of_field_focus_plane;
+
 private:
   // Allocates and initializes the pixel buffer for rendering, you
   // could add an interesting background to your scene by modifying
@@ -117,6 +122,8 @@ private:
 
   Colour subsampleRay(Point3D imagePlaneOrig, Point3D imagePlane, double factor,
       Matrix4x4 viewToWorld, Point3D origin);
+
+  Colour shadeSingleViewRay(Matrix4x4 viewToWorld, Point3D imagePlane, Point3D origin);
 
   // Return the colour of a ray given by the origin and the point on the
   // plane to shade
