@@ -262,7 +262,7 @@ Colour Raytracer::shadeViewRay(Matrix4x4 viewToWorld, Point3D imagePlane, Point3
       Point3D origin = Point3D((RANDOM - 0.5) * depth_of_field_aperature, (RANDOM - 0.5) * depth_of_field_aperature, 0);
       col = col + shadeSingleViewRay(viewToWorld, imagePlane, origin);
     }
-    return (1.0 / depth_of_field_rays) * col;
+    return col / depth_of_field_rays;
   } else {
     return shadeSingleViewRay(viewToWorld, imagePlane, origin);
   }
@@ -338,13 +338,13 @@ void Raytracer::render( int width, int height, Point3D eye, Vector3D view,
           if (cornersDifferent) {
             col = subsampleRay(imagePlaneOrig, imagePlane, factor, viewToWorld, origin);
             col = col + col1 + col2 + col3 + col4;
-            col = (1.0 / (antialias_rays + 4)) * col;
+            col = col / (antialias_rays + 4.0);
           } else {
-            col = (1.0 / 4.0) * (col1 + col2 + col3 + col4);
+            col = (col1 + col2 + col3 + col4) / 4.0;
           }
         } else {
           col = subsampleRay(imagePlaneOrig, imagePlane, factor, viewToWorld, origin);
-          col = (1.0 / antialias_rays) * col;
+          col = col / antialias_rays;
         }
       } else {
         imagePlane[0] = imagePlaneOrig[0] + 0.5 / factor;

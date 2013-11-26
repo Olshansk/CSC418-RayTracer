@@ -257,6 +257,10 @@ Colour operator *(double s, const Colour& c)
   return Colour(s*c[0], s*c[1], s*c[2]);
 }
 
+Colour operator /(const Colour& c, double s) {
+  return Colour(c[0]/s, c[1]/s, c[2]/s);
+}
+
 Colour operator +(const Colour& u, const Colour& v)
 {
   return Colour(u[0]+v[0], u[1]+v[1], u[2]+v[2]);
