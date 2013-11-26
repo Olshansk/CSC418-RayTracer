@@ -34,3 +34,14 @@ public:
       const Matrix4x4& modelToWorld );
 };
 
+class GeneralQuadratic : public SceneObject {
+public:
+  bool intersect( Ray3D& ray, const Matrix4x4& worldToModel,
+      const Matrix4x4& modelToWorld );
+  GeneralQuadratic( double a, double b, double c, double d, double e,
+      double f, double g, double h, double i, double j);
+private:
+  double a, b, c, d, e, f, g, h, i, j;
+
+
+};
