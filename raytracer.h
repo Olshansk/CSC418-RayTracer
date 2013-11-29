@@ -110,6 +110,7 @@ public:
   int depth_of_field_rays;
   float depth_of_field_aperature;
   float depth_of_field_focus_plane;
+  int max_reflection;
 
 private:
   // Allocates and initializes the pixel buffer for rendering, you

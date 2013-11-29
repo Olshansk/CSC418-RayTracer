@@ -168,7 +168,6 @@ Matrix4x4 Raytracer::initInvViewMatrix( Point3D eye, Vector3D view,
 
 void Raytracer::traverseScene( SceneDagNode* node, Ray3D& ray, Matrix4x4 modelToWorld, Matrix4x4 worldToModel) {
   SceneDagNode *childPtr;
-
   // Applies transformation of the current node to the global
   // transformation matrices.
   modelToWorld = modelToWorld*node->trans;
@@ -206,9 +205,9 @@ bool Raytracer::isIntersectionInShadow( Ray3D& ray, LightSource* light ) {
     return (!shadowRay.intersection.none && shadowRay.intersection.t_value > 0 && shadowRay.intersection.t_value <= 1);
 }
 
-// Potentiall TODO: Normalize t_value somehow.
+// Potentially TODO: Normalize t_value somehow.
 void Raytracer::applyReflection( Ray3D& ray ) {
-    if (ray.reflectionNumber < Ray3D::MAX_REFLECTION) {
+    if (ray.reflectionNumber < max_reflection) {
       Colour reflectionColour = reflectionColor(ray);
       ray.col = ray.col + ray.intersection.mat->reflection * exp (- ray.intersection.mat->ref_damping * ray.intersection.t_value) * reflectionColour;
       ray.col.clamp();
@@ -431,6 +430,8 @@ void printUsage() {
     "--height 240                  height of image to render\n"
     "--antialias 4                 number of rays to use for antialias subsampling\n"
     "--depth-of-field 60 0.05 1    number of rays, aperature size (bigger the blurier), focal plane distance\n"
+    "--reflection 1                number of reflection rays for each collision opint (bigger number creates\n"
+    "                              a more accurate reflection). The default values is 1.\n"
   );
 }
 
@@ -508,6 +509,13 @@ int main(int argc, char* argv[])
     printf("Using %d depth of field rays.\n", raytracer.depth_of_field_rays);
     printf("Using %f aperature size.\n", raytracer.depth_of_field_aperature);
     printf("Using focus plane %f units away from origin.\n", raytracer.depth_of_field_focus_plane);
+  }
+
+  int reflection_arg = contains_option(argc, argv, "--reflection");
+  raytracer.max_reflection = 1; // default value
+  if (reflection_arg > 0) {
+    raytracer.max_reflection = atoi(argv[reflection_arg + 1]);
+    printf("Maximum reflection number is %d.\n", raytracer.max_reflection);
   }
 
   int scene_num_arg = contains_option(argc, argv, "--scene");

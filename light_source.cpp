@@ -46,7 +46,7 @@ Ray3D PointLight::getShadowRay( Ray3D& ray ) {
 
 Ray3D LightSource::getReflectionRay( Ray3D& ray ) {
   Point3D origin = ray.intersection.point;
-  Vector3D direction = 2*((-1*ray.dir).dot(ray.intersection.normal))*ray.intersection.normal + ray.dir;
+  Vector3D direction = 2*((-ray.dir).dot(ray.intersection.normal))*ray.intersection.normal + ray.dir;
   Ray3D reflectionRay = Ray3D(origin, direction);
   reflectionRay.reflectionNumber += 1;
   reflectionRay.sceneObject = ray.intersection.sceneObject;
