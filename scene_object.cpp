@@ -44,12 +44,12 @@ bool UnitSquare::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
   bool intersectionInBounds = intersection[0] >= -bound && intersection[0] <= bound && intersection[1] >= -bound && intersection[1] <= bound;
 
   // Populate ray.intersection values
-  ray.intersection.none = !intersectionInBounds;
   if (intersectionInBounds) {
     ray.intersection.point = modelToWorld*intersection;
     ray.intersection.normal = transNorm(worldToModel, normal);
     ray.intersection.normal.normalize();
     ray.intersection.t_value = lambda;
+    ray.intersection.none = false;
   }
 
   return intersectionInBounds;
