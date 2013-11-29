@@ -39,9 +39,8 @@ public:
   bool intersect( Ray3D& ray, const Matrix4x4& worldToModel,
       const Matrix4x4& modelToWorld );
   GeneralQuadratic( double a, double b, double c, double d, double e,
-      double f, double g, double h, double i, double j);
+      double f, double g, double h, double i, double j):
+      a(a), b(b), c(c), d(d), e(e), f(f), g(g), h(h), i(i), j(j) {}
 private:
   double a, b, c, d, e, f, g, h, i, j;
-
-
 };

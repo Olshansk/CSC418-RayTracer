@@ -143,11 +143,11 @@ bool GeneralQuadratic::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
            + d * vy * vz + e * vz * vx + f * vx * vy
            + g * vx + h
             * vy + i * vz + j;
-  double D = B * B - 4.0f * A * C;
-  double didIntersect = D >= 0;
+  double D = B * B - 4 * A * C;
+  bool didIntersect = D >= 0;
 
   // Find how close the intersection is
-  if (D >= 0) {
+  if (didIntersect) {
     double lambda = - B / (2.0f * A);
     double ld1, ld2;
     ld1 = ld2 = 0;
@@ -188,17 +188,4 @@ bool GeneralQuadratic::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
   }
 
   return didIntersect;
-}
-GeneralQuadratic::GeneralQuadratic( double a, double b, double c, double d, double e,
-      double f, double g, double h, double i, double j) {
-  this->a = a;
-  this->b = b;
-  this->c = c;
-  this->d = d;
-  this->e = e;
-  this->f = f;
-  this->g = g;
-  this->h = h;
-  this->i = i;
-  this->j = j;
 }
