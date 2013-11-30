@@ -14,7 +14,7 @@
 #include "scene_object.h"
 #include "render_style.h"
 
-#define LAMBDA_EPSILON 0.0000000000001
+#define LAMBDA_EPSILON 0.000001
 
 // Finds intersection for UnitSquare, which is
 // defined on the xy-plane, with vertices (0.5, 0.5, 0),
@@ -35,7 +35,7 @@ bool UnitSquare::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
   double lambda = dot(q1 - modelPoint, normal)/dot(modelDirection, normal);
 
   // If a closer intersection exists, ignore this one
-  if ((ray.intersection.t_value < lambda && !ray.intersection.none) || (lambda < 0) || (ray.sceneObject && ray.sceneObject == this && lambda < LAMBDA_EPSILON)) {
+  if ((ray.intersection.t_value < lambda && !ray.intersection.none) || (lambda < 0) || (ray.startObject && ray.startObject == this && lambda < LAMBDA_EPSILON)) {
     return false;
   }
   // Find the intersection
@@ -83,14 +83,14 @@ bool UnitSphere::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
       ld2 = lambda - sqrt(d)/a;
       if (ld1 > 0 && ld2 < 0) {
         lambda = ld1;
-      } else if (ld1 > ld2 && ld2 > 0){
+      } else if (ld1 > ld2 && ld2 > LAMBDA_EPSILON){
         lambda = ld2;
       } else {
         lambda = ld1;
       }
     }
 
-    if ((ray.intersection.t_value < lambda && !ray.intersection.none) || (ld1 < 0 && ld2 < 0) || (lambda < 0) || (ray.sceneObject && ray.sceneObject == this && lambda < LAMBDA_EPSILON)) {
+    if ((ray.intersection.t_value < lambda && !ray.intersection.none) || (ld1 < 0 && ld2 < 0) || (lambda < 0) || (ray.startObject && ray.startObject == this && lambda < LAMBDA_EPSILON)) {
       return false;
     }
 
@@ -152,14 +152,14 @@ bool GeneralQuadratic::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
       ld2 = lambda - sqrt(D) / (2.0f * A);
       if (ld1 > 0 && ld2 < 0) {
         lambda = ld1;
-      } else if (ld1 > ld2 && ld2 > 0){
+      } else if (ld1 > ld2 && ld2 > LAMBDA_EPSILON){
         lambda = ld2;
       } else {
         lambda = ld1;
       }
     }
 
-    if ((!ray.intersection.none && ray.intersection.t_value < lambda) || (ld1 < 0 && ld2 < 0) || (lambda < 0) || (ray.sceneObject && ray.sceneObject == this && lambda < LAMBDA_EPSILON)) {
+    if ((!ray.intersection.none && ray.intersection.t_value < lambda) || (ld1 < 0 && ld2 < 0) || (lambda < 0) || (ray.startObject && ray.startObject == this && lambda < LAMBDA_EPSILON)) {
       return false;
     }
 

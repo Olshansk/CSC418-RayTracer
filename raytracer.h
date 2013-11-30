@@ -111,6 +111,7 @@ public:
   float depth_of_field_aperature;
   float depth_of_field_focus_plane;
   int max_reflection;
+  int max_refraction;
   bool withShadows;
   int glossy_rays;
 
@@ -144,8 +145,14 @@ private:
   // the object space of each node where intersection is performed.
   void traverseScene( SceneDagNode* node, Ray3D& ray, Matrix4x4 modelToWorld, Matrix4x4 worldToModel);
 
-  // Applies a reflection effect to the current colour if necessary
-  void applyReflection( Ray3D& ray );
+  // Retrieves the associated reflection colour
+  Colour getReflectionColour( Ray3D& ray );
+
+  // Retrieves the associated refraction colour
+  std::pair <Colour,double> getRefractionColour( Ray3D& ray );
+
+  // Applies both refraction and reflection with correct weight on each
+  void applyReflectance( Ray3D& ray );
 
   // Determine if the intersection of the ray is located in a shadow relative to that light source
   bool isIntersectionInShadow( Ray3D& ray, LightSource* light );

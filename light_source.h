@@ -8,6 +8,7 @@
 
 ***********************************************************/
 
+#include <utility>
 #include "util.h"
 
 // Base class for a light source.  You could define different types
@@ -16,6 +17,7 @@
 // differently.
 class LightSource {
 public:
+  static std::pair <Ray3D,double> getRefractionRay( Ray3D& ray );
   static Ray3D getReflectionRay( Ray3D& ray );
   virtual Ray3D getShadowRay( Ray3D& ray ) = 0;
   virtual void shade( Ray3D&, int glossy_rays ) = 0;

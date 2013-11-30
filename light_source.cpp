@@ -14,6 +14,16 @@
 
 #define GLOSS_LIGHT_RAY_MULTIPLIER 10
 
+void determineCurrentMedium( Ray3D& newRay, Ray3D& oldRay ) {
+  if (oldRay.currentMedium == oldRay.intersection.sceneObject) {
+    newRay.currentMedium = NULL;
+    newRay.currentMaterial = NULL;
+  } else {
+    newRay.currentMedium = oldRay.intersection.sceneObject;
+    newRay.currentMaterial = oldRay.intersection.mat;
+  }
+}
+
 void PointLight::shade( Ray3D& ray, int glossy_rays ) {
   Intersection intersection = ray.intersection;
   Material* mat = intersection.mat;
@@ -64,15 +74,59 @@ Ray3D PointLight::getShadowRay( Ray3D& ray ) {
   Point3D intersectionPoint = ray.intersection.point;
   Vector3D direction = get_position() - intersectionPoint;
   Ray3D shadowRay = Ray3D(intersectionPoint, direction);
-  shadowRay.sceneObject = ray.intersection.sceneObject;
+  shadowRay.startObject = ray.intersection.sceneObject;
   return shadowRay;
 }
 
 Ray3D LightSource::getReflectionRay( Ray3D& ray ) {
-  Point3D origin = ray.intersection.point;
-  Vector3D direction = 2*((-ray.dir).dot(ray.intersection.normal))*ray.intersection.normal + ray.dir;
-  Ray3D reflectionRay = Ray3D(origin, direction);
-  reflectionRay.reflectionNumber += 1;
-  reflectionRay.sceneObject = ray.intersection.sceneObject;
+  Vector3D dir = ray.dir;
+  Vector3D normal = ray.intersection.normal;
+  Vector3D direction = 2*((-dir).dot(normal)) * normal + dir;
+  Ray3D reflectionRay = Ray3D(ray.intersection.point, direction);
+  reflectionRay.reflectionNumber = ray.reflectionNumber + 1;
+  reflectionRay.startObject = ray.intersection.sceneObject;
   return reflectionRay;
+}
+
+std::pair <Ray3D,double> LightSource::getRefractionRay( Ray3D& ray ) {
+
+  Vector3D normal = ray.intersection.normal;
+  Vector3D dir = -ray.dir;
+  double n1 = 1.0f;
+  double n2 = ray.intersection.mat->n;
+  bool isExiting = !(normal.dot(ray.dir) < 0);
+
+  if (isExiting) {
+    normal = -normal;
+    if (ray.currentMedium != NULL) {
+      n1 = ray.currentMaterial->n;
+      n2 = 1.0;
+    } else {
+      return std::make_pair (Ray3D(Point3D(0,0,0), Vector3D(0,0,0)),0);
+    }
+  }
+
+  double n = n1 / n2;
+
+  double cosI = normal.dot(dir);
+  double sinT = n * n * (1.0 - cosI * cosI);
+  float cosT = sqrtf(1.0 - sinT);
+
+  if(cosT < 0.0){
+    return std::make_pair (Ray3D(Point3D(0,0,0), Vector3D(0,0,0)),0);
+  }
+
+  double r0rth = (n1 * cosI - n2 * cosT) / (n1 * cosI + n2 * cosT);
+  double rPar = (n2 * cosI - n1 * cosT) / (n2 * cosI + n1 * cosT);
+  double reflectance = (r0rth * r0rth + rPar * rPar) / 2;
+
+  Point3D origin = ray.intersection.point;
+  Vector3D direction = (n*cosI-cosT)*normal-(n*dir);
+  direction.normalize();
+  Ray3D refractionRay = Ray3D(origin, direction);
+  refractionRay.refractionNumber = ray.refractionNumber + 1;
+  refractionRay.startObject = ray.intersection.sceneObject;
+  determineCurrentMedium(refractionRay, ray);
+
+  return std::make_pair(refractionRay, reflectance);
 }

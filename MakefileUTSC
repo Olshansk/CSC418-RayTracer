@@ -13,10 +13,10 @@ CCC	          = g++
 #CCC	          = /usr/bin/g++
 
 # Define C compiler options
-CFLAGS        = -Wall -c -g
+CFLAGS        = -Wall -c -g -rdynamic
 
 # Define C++ compiler options
-CCCFLAGS      = -Wall -c -g
+CCCFLAGS      = -Wall -c -g -rdynamic
 
 # Define C/C++ pre-processor options
 CPPFLAGS      = -I./ -I/u/csc418h/include/fall05/include
