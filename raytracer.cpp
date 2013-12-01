@@ -296,6 +296,11 @@ void Raytracer::render( int width, int height, Point3D eye, Vector3D view,
   // Construct a ray for each pixel.
   #pragma omp parallel for
   for (int i = 0; i < _scrHeight; i++) {
+    Colour (*aaCache)[2];
+    if (antialias && antialias_rays > 4) {
+      aaCache = new Colour[_scrWidth][2];
+    }
+
     for (int j = 0; j < _scrWidth; j++) {
       // Sets up ray origin and direction in view space,
       // image plane is at z = -1.
@@ -312,21 +317,36 @@ void Raytracer::render( int width, int height, Point3D eye, Vector3D view,
       if (antialias) {
         if (antialias_rays > 4) {
           // Bottom left pixel
-          imagePlane[0] = imagePlaneOrig[0];
-          imagePlane[1] = imagePlaneOrig[1];
-          Colour col1 = shadeViewRay(viewToWorld, imagePlane, origin);
+          Colour col1;
+          if (j != 0) {
+            col1 = aaCache[j - 1][0];
+          } else {
+            imagePlane[0] = imagePlaneOrig[0];
+            imagePlane[1] = imagePlaneOrig[1];
+            col1 = shadeViewRay(viewToWorld, imagePlane, origin);
+          }
 
           // Bottom right pixel
           imagePlane[0] = imagePlaneOrig[0] + 1.0 / factor;
+          imagePlane[1] = imagePlaneOrig[1];
           Colour col2 = shadeViewRay(viewToWorld, imagePlane, origin);
+          aaCache[j][0] = col2;
 
           // Top right pixel
+          imagePlane[0] = imagePlaneOrig[0] + 1.0 / factor;
           imagePlane[1] = imagePlaneOrig[1] + 1.0 / factor;
           Colour col3 = shadeViewRay(viewToWorld, imagePlane, origin);
+          aaCache[j][1] = col3;
 
           // Top left pixel
-          imagePlane[0] = imagePlaneOrig[0];
-          Colour col4 = shadeViewRay(viewToWorld, imagePlane, origin);
+          Colour col4;
+          if (j != 0) {
+            col4 = aaCache[j - 1][1];
+          } else {
+            imagePlane[0] = imagePlaneOrig[0];
+            imagePlane[1] = imagePlaneOrig[1] + 1.0 / factor;
+            col4 = shadeViewRay(viewToWorld, imagePlane, origin);
+          }
 
           // Check if any of the corner pixels are substantially different than each other
           float threshold = ADAPTIVE_SUBSAMPLING_THRESHOLD;
