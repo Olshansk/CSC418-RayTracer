@@ -114,3 +114,79 @@ bool UnitSphere::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
 
   return didIntersect;
 }
+
+// reference: http://mrl.nyu.edu/~perlin/courses/fall2013/sep25b/
+bool GeneralQuadratic::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
+      const Matrix4x4& modelToWorld ) {
+
+  Point3D point = worldToModel * ray.origin;
+  Vector3D dir = worldToModel * ray.dir;
+
+  double wx = dir[0];
+  double wy = dir[1];
+  double wz = dir[2];
+
+  double vx = point[0];
+  double vy = point[1];
+  double vz = point[2];
+
+  double A = a * wx * wx + b * wy * wy + c * wz * wz
+           + d * wy * wz + e * wz * wx + f * wx * wy;
+  double B = 2.0f * (a * vx * wx + b * vy * wy + c * vz * wz)
+           + d * (vy * wz + vz * wy)
+           + e * (vz * wx + vx * wz)
+           + f * (vx * wy + vy * wx)
+           + g * wx
+           + h * wy
+           + i * wz;
+  double C = a * vx * vx + b * vy * vy + c * vz * vz
+           + d * vy * vz + e * vz * vx + f * vx * vy
+           + g * vx + h
+            * vy + i * vz + j;
+  double D = B * B - 4 * A * C;
+  bool didIntersect = D >= 0;
+
+  // Find how close the intersection is
+  if (didIntersect) {
+    double lambda = - B / (2.0f * A);
+    double ld1, ld2;
+    ld1 = ld2 = 0;
+    if (D > 0) {
+      ld1 = lambda + sqrt(D) / (2.0f * A);
+      ld2 = lambda - sqrt(D) / (2.0f * A);
+      if (ld1 > 0 && ld2 < 0) {
+        lambda = ld1;
+      } else if (ld1 > ld2 && ld2 > 0){
+        lambda = ld2;
+      } else {
+        lambda = ld1;
+      }
+    }
+
+    if ((!ray.intersection.none && ray.intersection.t_value < lambda) || (ld1 < 0 && ld2 < 0) || (lambda < 0) || (ray.sceneObject && ray.sceneObject == this && lambda < LAMBDA_EPSILON)) {
+      return false;
+    }
+
+    // Find the intersection and associated normal
+    Point3D intersection = point + lambda * dir;
+
+    double x = intersection[0];
+    double y = intersection[1];
+    double z = intersection[2];
+
+    Vector3D normal = Vector3D( 2.0f * a * x + e * z + f * y + g,
+                                2.0f * b * y + d * z + f * x + h,
+                                2.0f * c * z + d * y + e * x + i );
+
+    // Populate ray.intersection values
+    ray.intersection.none = !didIntersect;
+    ray.intersection.point = modelToWorld * intersection;
+    ray.intersection.t_value = lambda;
+    normal = transNorm(worldToModel, normal);
+    normal.normalize();
+    ray.intersection.normal = normal;
+    ray.intersection.sceneObject = this;
+  }
+
+  return didIntersect;
+}
