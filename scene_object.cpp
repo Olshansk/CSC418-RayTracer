@@ -163,7 +163,7 @@ bool GeneralQuadratic::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
       }
     }
 
-    if ((!ray.intersection.none && ray.intersection.t_value < lambda) || (ld1 < 0 && ld2 < 0) || (lambda < 0)) {
+    if ((!ray.intersection.none && ray.intersection.t_value < lambda) || (ld1 < 0 && ld2 < 0) || (lambda < 0) || (ray.sceneObject && ray.sceneObject == this && lambda < LAMBDA_EPSILON)) {
       return false;
     }
 
@@ -185,6 +185,7 @@ bool GeneralQuadratic::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
     normal = transNorm(worldToModel, normal);
     normal.normalize();
     ray.intersection.normal = normal;
+    ray.intersection.sceneObject = this;
   }
 
   return didIntersect;
