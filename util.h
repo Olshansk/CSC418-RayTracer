@@ -200,7 +200,7 @@ struct Ray3D {
   // This integer determines if the ray is a reflection or an "original" ray.
   // An original ray corresponds to a reflectioNumber of 0. This is used to
   // avoid infinite loops when doing reflections. This value must be capped
-  // to MAX_REFLECTION by the programmer.
+  // to max_reflection from raytracer by the programmer.
   int reflectionNumber;
   // This points to the object where the ray originated or nothing if it originated at the light
   SceneObject* sceneObject;
