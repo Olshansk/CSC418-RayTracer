@@ -17,6 +17,8 @@
 #include <cmath>
 #include <cstdlib>
 
+class SceneObject;
+
 #ifndef M_PI
 #define M_PI  3.14159265358979323846
 #endif
@@ -139,10 +141,15 @@ bool colourDiff(const Colour& u, const Colour&v, double threshold);
 std::ostream& operator <<(std::ostream& o, const Colour& c);
 
 struct Material {
-  Material( Colour ambient, Colour diffuse, Colour specular, double exp ) :
+  Material( Colour ambient, Colour diffuse, Colour specular, double exp, double reflection, double ref_damping) :
     ambient(ambient), diffuse(diffuse), specular(specular),
-    specular_exp(exp) {}
+    specular_exp(exp), reflection(reflection),
+    ref_damping(ref_damping) {}
 
+  // Fraction of secondary illumination that is reﬂected by the surface at intersection opint
+  double reflection;
+  // The reflactive damping coefficient; less specular reflection farther away.
+  double ref_damping;
   // Ambient components for Phong shading.
   Colour ambient;
   // Diffuse components for Phong shading.
@@ -167,15 +174,19 @@ struct Intersection {
   double t_value;
   // Set to true when no intersection has occured.
   bool none;
+  // This points to the object with which the ray colided
+  SceneObject* sceneObject;
 };
 
 // Ray structure.
 struct Ray3D {
   Ray3D() {
     intersection.none = true;
+    reflectionNumber = 0;
   }
   Ray3D( Point3D p, Vector3D v ) : origin(p), dir(v) {
     intersection.none = true;
+    reflectionNumber = 0;
   }
   // Origin and direction of the ray.
   Point3D origin;
@@ -186,5 +197,12 @@ struct Ray3D {
   // Current colour of the ray, should be computed by the shading
   // function.
   Colour col;
+  // This integer determines if the ray is a reflection or an "original" ray.
+  // An original ray corresponds to a reflectioNumber of 0. This is used to
+  // avoid infinite loops when doing reflections. This value must be capped
+  // to max_reflection from raytracer by the programmer.
+  int reflectionNumber;
+  // This points to the object where the ray originated or nothing if it originated at the light
+  SceneObject* sceneObject;
 };
 #endif

@@ -110,6 +110,8 @@ public:
   int depth_of_field_rays;
   float depth_of_field_aperature;
   float depth_of_field_focus_plane;
+  int max_reflection;
+  bool withShadows;
 
 private:
   // Allocates and initializes the pixel buffer for rendering, you
@@ -140,6 +142,16 @@ private:
   // Traversal code for the scene graph, the ray is transformed into
   // the object space of each node where intersection is performed.
   void traverseScene( SceneDagNode* node, Ray3D& ray, Matrix4x4 modelToWorld, Matrix4x4 worldToModel);
+
+  // Used to implement recursive illumination by spawning a new ray
+  // upon the collision of a former ray with an object
+  Colour reflectionColor( Ray3D& ray );
+
+  // Applies a reflection effect to the current colour if necessary
+  void applyReflection( Ray3D& ray );
+
+  // Determine if the intersection of the ray is located in a shadow relative to that light source
+  bool isIntersectionInShadow( Ray3D& ray, LightSource* light );
 
   // After intersection, calculate the colour of the ray by shading it
   // with all light sources in the scene.

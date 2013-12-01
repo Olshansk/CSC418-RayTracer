@@ -10,8 +10,11 @@
 
 #include <cmath>
 #include <iostream>
+#include <limits>
 #include "scene_object.h"
 #include "render_style.h"
+
+#define LAMBDA_EPSILON 0.0000000000001
 
 // Finds intersection for UnitSquare, which is
 // defined on the xy-plane, with vertices (0.5, 0.5, 0),
@@ -35,7 +38,7 @@ bool UnitSquare::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
   double lambda = dot(q1 - modelPoint, normal)/dot(modelDirection, normal);
 
   // If a closer intersection exists, ignore this one
-  if (ray.intersection.t_value < lambda && !ray.intersection.none) {
+  if ((ray.intersection.t_value < lambda && !ray.intersection.none) || (lambda < 0) || (ray.sceneObject && ray.sceneObject == this && lambda < LAMBDA_EPSILON)) {
     return false;
   }
 
@@ -50,6 +53,7 @@ bool UnitSquare::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
     ray.intersection.normal.normalize();
     ray.intersection.t_value = lambda;
     ray.intersection.none = false;
+    ray.intersection.sceneObject = this;
   }
 
   return intersectionInBounds;
@@ -90,8 +94,7 @@ bool UnitSphere::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
       }
     }
 
-    // If a closer intersection exists, ignore this one
-    if ((ray.intersection.t_value < lambda && !ray.intersection.none) || (ld1 < 0 && ld2 < 0)) {
+    if ((ray.intersection.t_value < lambda && !ray.intersection.none) || (ld1 < 0 && ld2 < 0) || (lambda < 0) || (ray.sceneObject && ray.sceneObject == this && lambda < LAMBDA_EPSILON)) {
       return false;
     }
 
@@ -106,6 +109,7 @@ bool UnitSphere::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
     normal = transNorm(worldToModel, normal);
     normal.normalize();
     ray.intersection.normal = normal;
+    ray.intersection.sceneObject = this;
   }
 
   return didIntersect;

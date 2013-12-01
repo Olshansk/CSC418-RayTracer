@@ -10,6 +10,7 @@
 
 #include <cmath>
 #include "util.h"
+#include "scene_object.h"
 
 Point3D::Point3D() {
   m_data[0] = 0.0;
