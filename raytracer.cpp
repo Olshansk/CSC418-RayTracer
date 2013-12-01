@@ -30,6 +30,8 @@ Raytracer::Raytracer() : _lightSource(NULL) {
   depth_of_field_rays = 0;
   depth_of_field_aperature = 0;
   depth_of_field_focus_plane = 1.0;
+  max_reflection = 0;
+  withShadows = false;
 }
 
 Raytracer::~Raytracer() {
@@ -222,8 +224,11 @@ void Raytracer::computeShading( Ray3D& ray ) {
 
     // Appply secondary reflection
     applyReflection(ray);
-
-    curLight->light->shade(ray, isIntersectionInShadow(ray, curLight->light));
+    if (withShadows) {
+      curLight->light->shade(ray, isIntersectionInShadow(ray, curLight->light));
+    } else {
+      curLight->light->shade(ray, false);
+    }
     curLight = curLight->next;
   }
 }
@@ -431,7 +436,8 @@ void printUsage() {
     "--antialias 4                 number of rays to use for antialias subsampling\n"
     "--depth-of-field 60 0.05 1    number of rays, aperature size (bigger the blurier), focal plane distance\n"
     "--reflection 1                number of reflection rays for each collision opint (bigger number creates\n"
-    "                              a more accurate reflection). The default values is 1.\n"
+    "                              a more accurate reflection). The default values is 0.\n"
+    "--shadows                     including this argument adds shadows\n"
   );
 }
 
@@ -512,7 +518,6 @@ int main(int argc, char* argv[])
   }
 
   int reflection_arg = contains_option(argc, argv, "--reflection");
-  raytracer.max_reflection = 1; // default value
   if (reflection_arg > 0) {
     raytracer.max_reflection = atoi(argv[reflection_arg + 1]);
     printf("Maximum reflection number is %d.\n", raytracer.max_reflection);
@@ -527,6 +532,13 @@ int main(int argc, char* argv[])
     printUsage();
     return 0;
   }
+
+  int shadows_arg = contains_option(argc, argv, "--shadows");
+  if (shadows_arg > 0) {
+    raytracer.withShadows = true;
+    printf("Rendering scene with shadows.\n");
+  }
+
 
   printf("\n");
 
