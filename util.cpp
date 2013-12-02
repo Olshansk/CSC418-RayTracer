@@ -259,12 +259,30 @@ Colour operator *(double s, const Colour& c)
 }
 
 Colour operator /(const Colour& c, double s) {
-  return Colour(c[0]/s, c[1]/s, c[2]/s);
+  Colour col = c;
+  col /= s;
+  return col;
+}
+
+
+Colour &operator /=(Colour& c, double s) {
+  c[0] /= s;
+  c[1] /= s;
+  c[2] /= s;
 }
 
 Colour operator +(const Colour& u, const Colour& v)
 {
-  return Colour(u[0]+v[0], u[1]+v[1], u[2]+v[2]);
+  Colour col = Colour();
+  col += u;
+  col += v;
+  return col;
+}
+
+Colour &operator +=(Colour& u, const Colour& v) {
+  u[0] += v[0];
+  u[1] += v[1];
+  u[2] += v[2];
 }
 
 Colour operator -(const Colour& u, const Colour& v)

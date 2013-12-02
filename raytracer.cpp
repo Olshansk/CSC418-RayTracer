@@ -211,7 +211,7 @@ bool Raytracer::isIntersectionInShadow( Ray3D& ray, LightSource* light ) {
 void Raytracer::applyReflection( Ray3D& ray ) {
     if (ray.reflectionNumber < max_reflection) {
       Colour reflectionColour = reflectionColor(ray);
-      ray.col = ray.col + ray.intersection.mat->reflection * exp (- ray.intersection.mat->ref_damping * ray.intersection.t_value) * reflectionColour;
+      ray.col += ray.intersection.mat->reflection * exp (- ray.intersection.mat->ref_damping * ray.intersection.t_value) * reflectionColour;
       ray.col.clamp();
     }
 }
@@ -221,13 +221,13 @@ void Raytracer::computeShading( Ray3D& ray ) {
   int num_lights = 0;
   for (LightListNode* curLight = _lightSource; curLight != NULL; curLight = curLight->next) {
     if (curLight->light->hasAmbient()) {
-      ambientCol = ambientCol + curLight->light->shadeAmbient(ray.intersection.mat);
+      ambientCol += curLight->light->shadeAmbient(ray.intersection.mat);
       num_lights ++;
     }
   }
 
   if (num_lights != 0) {
-    ray.col = ray.col + ambientCol / double(num_lights);
+    ray.col += ambientCol / double(num_lights);
   }
 
   for (LightListNode* curLight = _lightSource; curLight != NULL; curLight = curLight->next) {
@@ -291,7 +291,7 @@ Colour Raytracer::shadeViewRay(Matrix4x4 viewToWorld, Point3D imagePlane, Point3
     Colour col = Colour();
     for (int m = 0; m < depth_of_field_rays; m++) {
       Point3D origin = Point3D((RANDOM - 0.5) * depth_of_field_aperature, (RANDOM - 0.5) * depth_of_field_aperature, 0);
-      col = col + shadeSingleViewRay(viewToWorld, imagePlane, origin);
+      col += shadeSingleViewRay(viewToWorld, imagePlane, origin);
     }
     return col / depth_of_field_rays;
   } else {
@@ -306,7 +306,7 @@ Colour Raytracer::subsampleRay(Point3D imagePlaneOrig, Point3D imagePlane, doubl
     imagePlane[0] = imagePlaneOrig[0] + RANDOM / factor;
     imagePlane[1] = imagePlaneOrig[1] + RANDOM / factor;
 
-    col = col + shadeViewRay(viewToWorld, imagePlane, origin);
+    col += shadeViewRay(viewToWorld, imagePlane, origin);
   }
 
   return col;
@@ -388,14 +388,14 @@ void Raytracer::render( int width, int height, Point3D eye, Vector3D view,
 
           if (cornersDifferent) {
             col = subsampleRay(imagePlaneOrig, imagePlane, factor, viewToWorld, origin);
-            col = col + col1 + col2 + col3 + col4;
-            col = col / (antialias_rays + 4.0);
+            col += col1 + col2 + col3 + col4;
+            col /= (antialias_rays + 4.0);
           } else {
             col = (col1 + col2 + col3 + col4) / 4.0;
           }
         } else {
           col = subsampleRay(imagePlaneOrig, imagePlane, factor, viewToWorld, origin);
-          col = col / antialias_rays;
+          col /= antialias_rays;
         }
       } else {
         imagePlane[0] = imagePlaneOrig[0] + 0.5 / factor;
