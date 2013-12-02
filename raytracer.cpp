@@ -529,6 +529,12 @@ int main(int argc, char* argv[])
     printf("Maximum reflection number is %d.\n", raytracer.max_reflection);
   }
 
+  int shadows_arg = contains_option(argc, argv, "--shadows");
+  if (shadows_arg > 0) {
+    raytracer.withShadows = true;
+    printf("Rendering scene with shadows.\n");
+  }
+
   int scene_num_arg = contains_option(argc, argv, "--scene");
   int scene_num;
   if (scene_num_arg > 0) {
@@ -538,13 +544,6 @@ int main(int argc, char* argv[])
     printUsage();
     return 0;
   }
-
-  int shadows_arg = contains_option(argc, argv, "--shadows");
-  if (shadows_arg > 0) {
-    raytracer.withShadows = true;
-    printf("Rendering scene with shadows.\n");
-  }
-
 
   printf("\n");
 
