@@ -24,7 +24,6 @@ void PointLight::shade( Ray3D& ray , bool isInShadow) {
   Vector3D r_vec = 2.0 * (normal.dot(s_vec)) * normal - s_vec;
 
   Colour col = ray.col;
-  col = col + (mat->ambient * _col_ambient);
   if (!isInShadow) {
     col = col + fmax(0, normal.dot(s_vec)) * (mat->diffuse * _col_diffuse);
     if (RenderStyle::rstyle != AMBIENT_DIFFUSE) {
@@ -34,6 +33,10 @@ void PointLight::shade( Ray3D& ray , bool isInShadow) {
 
   col.clamp();
   ray.col = col;
+}
+
+Colour PointLight::shadeAmbient(Material* mat) {
+  return mat->ambient * _col_ambient;
 }
 
 Ray3D PointLight::getShadowRay( Ray3D& ray ) {

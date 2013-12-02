@@ -20,6 +20,8 @@ public:
   virtual Ray3D getShadowRay( Ray3D& ray ) = 0;
   virtual void shade( Ray3D&, bool isInShadow ) = 0;
   virtual Point3D get_position() const = 0;
+  virtual bool hasAmbient() { return false; }
+  virtual Colour shadeAmbient(Material* mat) {}
 };
 
 // A point light is defined by its position in world space and its
@@ -34,6 +36,8 @@ public:
   void shade( Ray3D& ray, bool isInShadow);
   Ray3D getShadowRay( Ray3D& ray );
   Point3D get_position() const { return _pos; }
+  bool hasAmbient() { return true; }
+  Colour shadeAmbient(Material* mat);
 
 private:
   Point3D _pos;
