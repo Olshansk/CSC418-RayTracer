@@ -217,19 +217,12 @@ void Raytracer::applyReflection( Ray3D& ray ) {
 }
 
 void Raytracer::computeShading( Ray3D& ray ) {
-  LightListNode* curLight = _lightSource;
-  for (;;) {
-    if (curLight == NULL) break;
+  for (LightListNode* curLight = _lightSource; curLight != NULL; curLight = curLight->next) {
     // Each lightSource provides its own shading function.
+    curLight->light->shade(ray, withShadows && isIntersectionInShadow(ray, curLight->light));
 
     // Appply secondary reflection
     applyReflection(ray);
-    if (withShadows) {
-      curLight->light->shade(ray, isIntersectionInShadow(ray, curLight->light));
-    } else {
-      curLight->light->shade(ray, false);
-    }
-    curLight = curLight->next;
   }
 }
 
