@@ -204,13 +204,14 @@ bool Raytracer::isIntersectionInShadow( Ray3D& ray, LightSource* light ) {
 
 // Potentially TODO: Normalize t_value somehow.
 void Raytracer::applyReflection( Ray3D& ray ) {
-    if (ray.reflectionNumber < max_reflection) {
-      Ray3D reflectionRay = LightSource::getReflectionRay(ray);
-      Colour reflectionColour = shadeRay(reflectionRay);
+  Material* mat = ray.intersection.mat;
+  if (ray.reflectionNumber < max_reflection && mat->reflection != 0) {
+    Ray3D reflectionRay = LightSource::getReflectionRay(ray);
+    Colour reflectionColour = shadeRay(reflectionRay);
 
-      ray.col += ray.intersection.mat->reflection * exp (- ray.intersection.mat->ref_damping * reflectionRay.intersection.t_value) * reflectionColour;
-      ray.col.clamp();
-    }
+    ray.col += mat->reflection * exp (- mat->ref_damping * reflectionRay.intersection.t_value) * reflectionColour;
+    ray.col.clamp();
+  }
 }
 
 void Raytracer::computeShading( Ray3D& ray ) {
@@ -234,7 +235,7 @@ void Raytracer::computeShading( Ray3D& ray ) {
     }
   }
 
-  // Appply secondary reflection
+  // Apply secondary reflection
   applyReflection(ray);
 }
 
