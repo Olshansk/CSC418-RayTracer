@@ -549,16 +549,18 @@ int main(int argc, char* argv[])
   // Defines a material for shading.
   Material gold( Colour(0.3, 0.3, 0.3), Colour(0.75164, 0.60648, 0.22648),
       Colour(0.628281, 0.555802, 0.366065),
-      51.2, 0.3, 0.2);
+      51.2, 1, 0.2);
   Material ruby( Colour(0.1745, 0.01175, 0.01175), Colour(0.61424, 0.04136, 0.04136),
       Colour(0.727811, 0.626959, 0.626959),
-      51.2, 0, 0 );
+      51.2, 0.2, 0 );
   Material emerald( Colour(0.0215, 0.1745, 0.0215), Colour(0.07568, 0.61424, 0.07568),
       Colour(0.633, 0.727811, 0.633),
-      51.2, 0, 0 );
+      51.2, 1, 0 );
   Material jade( Colour(0, 0, 0), Colour(0.54, 0.89, 0.63),
       Colour(0.316228, 0.316228, 0.316228),
       12.8, 0.3, 0.2 );
+  Material mirrorAlmost( Colour(0.2, 0.2, 0.2), Colour(0.2, 0.2, 0.2), Colour(0.2, 0.2, 0.2),
+      1, 1, 0.5);
 
   if (scene_num == 1) {
     // Camera parameters.
@@ -636,54 +638,32 @@ int main(int argc, char* argv[])
     // Render the scene
     raytracer.render(width, height, eye, view, up, fov, scene_num);
   } else if (scene_num == 4) {
-    // Defines a point light source.
-    Point3D eye(0, 0, 1);
+    Point3D eye(0, 0.5, 1);
     Vector3D view(0, 0, -1);
     Vector3D up(0, 1, 0);
     double fov = 60;
 
-    raytracer.addLightSource( new PointLight(Point3D(0, 0, 5),
+    raytracer.addLightSource( new PointLight(Point3D(-1, 5, -2),
           Colour(0.9, 0.9, 0.9) ) );
 
-    // Add a unit square into the scene with material mat.
-    // SceneDagNode* sphere = raytracer.addObject( new GeneralQuadratic(1, 1, 1, 0, 0, 0, 0, 0, 0, -1), &gold );
-    SceneDagNode* cone = raytracer.addObject( new GeneralQuadratic(1, -1, 1, 0, 0, 0, 0, 0, 0, -1), &gold );
-    // SceneDagNode* cylinder = raytracer.addObject( new GeneralQuadratic(1, 0, 1, 0, 0, 0, 0, 0, 0, -1), &gold );
-    SceneDagNode* plane = raytracer.addObject( new UnitSquare(), &jade );
+    raytracer.addLightSource( new PointLight(Point3D(-1, 5, -10),
+          Colour(0.9, 0.9, 0.9) ) );
 
-    // Apply some transformations to the unit square.
 
-    double factor1[3] = { 1.0, 3.0, 1.0 };
-    double factor2[3] = { 6.0, 6.0, 6.0 };
-    double factor3[3] = { 1, 1, 1 };
+    SceneDagNode* sphere1 = raytracer.addObject( new UnitSphere(), &emerald );
+    SceneDagNode* sphere2 = raytracer.addObject( new UnitSphere(), &ruby );
+    SceneDagNode* sphere3 = raytracer.addObject( new UnitSphere(), &gold );
+    SceneDagNode* plane = raytracer.addObject( new Plane(), &mirrorAlmost );
 
-    // raytracer.translate(sphere, Vector3D(0, 0, -5));
-    // raytracer.rotate(sphere, 'x', -45);
-    // raytracer.rotate(sphere, 'z', 45);
-    // raytracer.scale(sphere, Point3D(0, 0, 0), factor1);
+    raytracer.translate(sphere1, Vector3D(-2.1, 0, -6));
+    raytracer.translate(sphere2, Vector3D(0   , 0, -6));
+    raytracer.translate(sphere3, Vector3D(2.1 , 0, -6));
 
-    raytracer.translate(cone, Vector3D(0, 0, -5));
-    // raytracer.rotate(cone, 'x', -45);
-    // raytracer.rotate(cone, 'z', 45);
-    raytracer.scale(cone, Point3D(0, 0, 0), factor1);
+    raytracer.translate(plane, Vector3D(0, -1, 0));
+    raytracer.rotate(plane, 'x', -90);
 
-    // raytracer.translate(cylinder, Vector3D(0, 0, -5));
-    // raytracer.rotate(cylinder, 'x', -45);
-    // raytracer.rotate(cylinder, 'z', 45);
-    // raytracer.scale(cylinder, Point3D(0, 0, 0), factor3);
-
-    raytracer.translate(plane, Vector3D(0, 0, -7));
-    raytracer.rotate(plane, 'z', 45);
-    raytracer.scale(plane, Point3D(0, 0, 0), factor2);
-
-    // Render the scene, feel free to make the image smaller for
-    // testing purposes.
+    // Render the scene
     raytracer.render(width, height, eye, view, up, fov, scene_num);
-
-    // Render it from a different point of view.
-    Point3D eye2(4, 2, 1);
-    Vector3D view2(-4, -2, -6);
-    raytracer.render(width, height, eye2, view2, up, fov, scene_num);
   }
 
   return 0;
