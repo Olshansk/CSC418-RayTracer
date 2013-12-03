@@ -217,22 +217,21 @@ void Raytracer::applyReflection( Ray3D& ray ) {
 void Raytracer::computeShading( Ray3D& ray ) {
   Colour ambientCol = Colour();
   int num_lights = 0;
+
   for (LightListNode* curLight = _lightSource; curLight != NULL; curLight = curLight->next) {
     if (curLight->light->hasAmbient()) {
       ambientCol += curLight->light->shadeAmbient(ray.intersection.mat);
       num_lights ++;
     }
-  }
 
-  if (num_lights != 0) {
-    ray.col += ambientCol / double(num_lights);
-  }
-
-  for (LightListNode* curLight = _lightSource; curLight != NULL; curLight = curLight->next) {
     // Each lightSource provides its own shading function.
     if (!withShadows || !isIntersectionInShadow(ray, curLight->light)) {
       curLight->light->shade(ray);
     }
+  }
+
+  if (num_lights != 0) {
+    ray.col += ambientCol / double(num_lights);
   }
 
   // Apply secondary reflection
