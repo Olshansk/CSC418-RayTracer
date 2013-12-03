@@ -12,7 +12,7 @@
 #include "light_source.h"
 #include "render_style.h"
 
-void PointLight::shade( Ray3D& ray , bool isInShadow) {
+void PointLight::shade( Ray3D& ray) {
   Intersection intersection = ray.intersection;
   Material* mat = intersection.mat;
   Vector3D normal = intersection.normal;
@@ -24,11 +24,9 @@ void PointLight::shade( Ray3D& ray , bool isInShadow) {
   Vector3D r_vec = 2.0 * (normal.dot(s_vec)) * normal - s_vec;
 
   Colour col = ray.col;
-  if (!isInShadow) {
-    col += fmax(0, normal.dot(s_vec)) * (mat->diffuse * _col_diffuse);
-    if (RenderStyle::rstyle != AMBIENT_DIFFUSE) {
-      col += pow(fmax(0, -r_vec.dot(incident_vec)), mat->specular_exp) * (mat->specular * _col_specular);
-    }
+  col += fmax(0, normal.dot(s_vec)) * (mat->diffuse * _col_diffuse);
+  if (RenderStyle::rstyle != AMBIENT_DIFFUSE) {
+    col += pow(fmax(0, -r_vec.dot(incident_vec)), mat->specular_exp) * (mat->specular * _col_specular);
   }
 
   col.clamp();
