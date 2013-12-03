@@ -196,11 +196,6 @@ void Raytracer::traverseScene( SceneDagNode* node, Ray3D& ray, Matrix4x4 modelTo
   modelToWorld = modelToWorld*node->invtrans;
 }
 
-Colour Raytracer::reflectionColor( Ray3D& ray ) {
-  Ray3D reflectionRay = LightSource::getReflectionRay(ray);
-  return shadeRay(reflectionRay);
-}
-
 bool Raytracer::isIntersectionInShadow( Ray3D& ray, LightSource* light ) {
     Ray3D shadowRay = light->getShadowRay(ray);
     traverseScene(_root, shadowRay, Matrix4x4(), Matrix4x4());
@@ -210,8 +205,10 @@ bool Raytracer::isIntersectionInShadow( Ray3D& ray, LightSource* light ) {
 // Potentially TODO: Normalize t_value somehow.
 void Raytracer::applyReflection( Ray3D& ray ) {
     if (ray.reflectionNumber < max_reflection) {
-      Colour reflectionColour = reflectionColor(ray);
-      ray.col += ray.intersection.mat->reflection * exp (- ray.intersection.mat->ref_damping * ray.intersection.t_value) * reflectionColour;
+      Ray3D reflectionRay = LightSource::getReflectionRay(ray);
+      Colour reflectionColour = shadeRay(reflectionRay);
+
+      ray.col += ray.intersection.mat->reflection * exp (- ray.intersection.mat->ref_damping * reflectionRay.intersection.t_value) * reflectionColour;
       ray.col.clamp();
     }
 }
