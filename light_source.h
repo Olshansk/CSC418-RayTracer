@@ -38,6 +38,7 @@ public:
   Point3D get_position() const { return _pos; }
   bool hasAmbient() { return true; }
   Colour shadeAmbient(Material* mat);
+  Colour shadeAmbient(Vector3D r_vec, Vector3D incident_vec, Material* mat) ;
 
 private:
   Point3D _pos;

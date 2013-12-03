@@ -39,17 +39,21 @@ void PointLight::shade( Ray3D& ray, int glossy_rays ) {
 
       for (int i = 0; i < glossy_rays; i++) {
         Vector3D rand_r_vec = randomDeviation(r_vec, ortho1, ortho2, mat->glossiness);
-        specCol += pow(fmax(0, -rand_r_vec.dot(incident_vec)), mat->specular_exp) * (mat->specular * _col_specular);
+        specCol += shadeAmbient(r_vec, incident_vec, mat);
       }
 
       col += specCol / glossy_rays;
     } else {
-      col += pow(fmax(0, -r_vec.dot(incident_vec)), mat->specular_exp) * (mat->specular * _col_specular);
+      col += shadeAmbient(r_vec, incident_vec, mat);
     }
   }
 
   col.clamp();
   ray.col = col;
+}
+
+Colour PointLight::shadeAmbient(Vector3D r_vec, Vector3D incident_vec, Material* mat) {
+  return pow(fmax(0, -r_vec.dot(incident_vec)), mat->specular_exp) * (mat->specular * _col_specular);
 }
 
 Colour PointLight::shadeAmbient(Material* mat) {
