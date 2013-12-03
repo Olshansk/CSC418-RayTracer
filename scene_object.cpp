@@ -23,9 +23,6 @@
 bool UnitSquare::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
     const Matrix4x4& modelToWorld ) {
 
-  // Half oof the unit square's edge length
-  double bound = 0.5;
-
   // Transform ray into object space
   Point3D modelPoint = worldToModel*ray.origin;
   Vector3D modelDirection = worldToModel*ray.dir;
