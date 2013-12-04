@@ -210,7 +210,7 @@ std::ostream& operator <<(std::ostream& s, const Vector3D& v)
 
 Vector3D orthogonal(const Vector3D& u) {
   Vector3D ortho;
-  if (u[2] != 0 || u[1] != 0)) {
+  if (u[2] != 0 || u[1] != 0) {
     ortho = Vector3D(0, -u[2], u[1]);
   } else {
     ortho = Vector3D(u[1], -u[0], 0);
