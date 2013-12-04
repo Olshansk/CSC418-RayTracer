@@ -617,10 +617,10 @@ int main(int argc, char* argv[])
       51.2, 1, 0.2, UNUSED_MATERIAL_PROPERTY_VALUE, UNUSED_MATERIAL_PROPERTY_VALUE);
   Material ruby( Colour(0.1745, 0.01175, 0.01175), Colour(0.61424, 0.04136, 0.04136),
       Colour(0.727811, 0.626959, 0.626959),
-      51.2, UNUSED_MATERIAL_PROPERTY_VALUE, 0, UNUSED_MATERIAL_PROPERTY_VALUE, UNUSED_MATERIAL_PROPERTY_VALUE);
+      51.2, 0.2, 0, UNUSED_MATERIAL_PROPERTY_VALUE, UNUSED_MATERIAL_PROPERTY_VALUE);
   Material emerald( Colour(0.0215, 0.1745, 0.0215), Colour(0.07568, 0.61424, 0.07568),
       Colour(0.633, 0.727811, 0.633),
-      51.2, UNUSED_MATERIAL_PROPERTY_VALUE, 0, UNUSED_MATERIAL_PROPERTY_VALUE, 1.0);
+      51.2, 1, 0, UNUSED_MATERIAL_PROPERTY_VALUE, 1.0);
   Material jade( Colour(0, 0, 0), Colour(0.54, 0.89, 0.63),
       Colour(0.316228, 0.316228, 0.316228),
       12.8, 0.3, 0.2, UNUSED_MATERIAL_PROPERTY_VALUE, UNUSED_MATERIAL_PROPERTY_VALUE);
@@ -698,7 +698,7 @@ int main(int argc, char* argv[])
     raytracer.scale(plane, Point3D(0, 0, 0), factor2);
     raytracer.render(width, height, eye, view, up, fov, scene_num);
   } else if (scene_num == 3) {
-    Point3D eye(0, 1, 1);
+    Point3D eye(0, 0.8, 1);
     Vector3D view(0, 0, -1);
     Vector3D up(0, 1, 0);
     double fov = 60;
@@ -709,10 +709,14 @@ int main(int argc, char* argv[])
     SceneDagNode* sphere1 = raytracer.addObject( new UnitSphere(), &ruby );
     SceneDagNode* sphere2 = raytracer.addObject( new UnitSphere(), &emerald );
     SceneDagNode* sphere3 = raytracer.addObject( new UnitSphere(), &gold );
+    SceneDagNode* plane = raytracer.addObject( new Plane(), &silver );
 
     raytracer.translate(sphere1, Vector3D(0, 0, -5));
     raytracer.translate(sphere2, Vector3D(3.2, 0, -11));
     raytracer.translate(sphere3, Vector3D(-3.2, 0, -8));
+
+    raytracer.translate(plane, Vector3D(0, -1, 0));
+    raytracer.rotate(plane, 'x', -90);
 
     // Render the scene
     raytracer.render(width, height, eye, view, up, fov, scene_num);
