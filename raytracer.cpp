@@ -628,8 +628,8 @@ int main(int argc, char* argv[])
       Colour(0.727811, 0.626959, 0.626959),
       51.2, UNUSED_MATERIAL_PROPERTY_VALUE, 0, UNUSED_MATERIAL_PROPERTY_VALUE, UNUSED_MATERIAL_PROPERTY_VALUE);
   Material emerald( Colour(0.0215, 0.1745, 0.0215), Colour(0.07568, 0.61424, 0.07568),
-      Colour(0.633, 0.727811, 0.633, 1.0),
-      51.2, UNUSED_MATERIAL_PROPERTY_VALUE, 0, UNUSED_MATERIAL_PROPERTY_VALUE);
+      Colour(0.633, 0.727811, 0.633),
+      51.2, UNUSED_MATERIAL_PROPERTY_VALUE, 0, UNUSED_MATERIAL_PROPERTY_VALUE, 1.0);
   Material jade( Colour(0, 0, 0), Colour(0.54, 0.89, 0.63),
       Colour(0.316228, 0.316228, 0.316228),
       12.8, 0.3, 0.2, UNUSED_MATERIAL_PROPERTY_VALUE, UNUSED_MATERIAL_PROPERTY_VALUE);
@@ -638,7 +638,7 @@ int main(int argc, char* argv[])
   Material silver( Colour(0.19225, 0.19225, 0.19225), Colour(0.50754, 0.50754, 0.50754),
       Colour(0.508273, 0.508273, 0.508273),
       51.2, 1, 0.2, UNUSED_MATERIAL_PROPERTY_VALUE, UNUSED_MATERIAL_PROPERTY_VALUE);
-  Material glass( Colour(0, 0, 0), Colour(0.0, 0.0, 0.0),
+  Material glass( Colour(0, 0, 0), Colour(0.0, 0.0, 0.0), Colour(0.0, 0.0, 0.0),
       51.2, 1, 0.2, UNUSED_MATERIAL_PROPERTY_VALUE, UNUSED_MATERIAL_PROPERTY_VALUE);
   Material glass1( Colour(0, 0, 0), Colour(0.0, 0.0, 0.0),
       Colour(0.0, 0.0, 0.0),

@@ -210,7 +210,7 @@ std::ostream& operator <<(std::ostream& s, const Vector3D& v)
 
 Vector3D orthogonal(const Vector3D& u) {
   Vector3D ortho;
-  if (u[2] != 0 || u[1] != 0)) {
+  if (u[2] != 0 || u[1] != 0) {
     ortho = Vector3D(0, -u[2], u[1]);
   } else {
     ortho = Vector3D(u[1], -u[0], 0);
@@ -442,7 +442,6 @@ Point3D operator *(const Matrix4x4& M, const Point3D& p) {
       p[0] * M[0][0] + p[1] * M[0][1] + p[2] * M[0][2] + M[0][3],
       p[0] * M[1][0] + p[1] * M[1][1] + p[2] * M[1][2] + M[1][3],
       p[0] * M[2][0] + p[1] * M[2][1] + p[2] * M[2][2] + M[2][3]);
-  }
 }
 
 Vector3D transNorm(const Matrix4x4& M, const Vector3D& n) {
@@ -469,5 +468,8 @@ Ray3D::Ray3D(const Ray3D& other) {
   intersection = other.intersection;
   col = other.col;
   reflectionNumber = other.reflectionNumber;
-  sceneObject = other.sceneObject;
+  refractionNumber = other.refractionNumber;
+  startObject = other.startObject;
+  currentMedium = other.currentMedium;
+  currentMaterial = other.currentMaterial;
 }
