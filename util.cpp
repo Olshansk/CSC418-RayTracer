@@ -468,5 +468,8 @@ Ray3D::Ray3D(const Ray3D& other) {
   intersection = other.intersection;
   col = other.col;
   reflectionNumber = other.reflectionNumber;
-  sceneObject = other.sceneObject;
+  refractionNumber = other.refractionNumber;
+  startObject = other.startObject;
+  currentMedium = other.currentMedium;
+  currentMaterial = other.currentMaterial;
 }

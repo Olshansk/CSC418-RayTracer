@@ -27,18 +27,16 @@ bool UnitSquare::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
   Point3D modelPoint = worldToModel*ray.origin;
   Vector3D modelDirection = worldToModel*ray.dir;
 
-  // The square's normal and a point on the square
-  Vector3D normal = Vector3D(0, 0, ray.origin[2] > 0 ? 1 : -1);
+  Vector3D normal = Vector3D(0, 0, 1);
   Point3D q1 = Point3D(0, 0, 0);
 
   // Find how close the intersection is
   double lambda = dot(q1 - modelPoint, normal)/dot(modelDirection, normal);
 
   // If a closer intersection exists, ignore this one
-  if ((ray.intersection.t_value < lambda && !ray.intersection.none) || (lambda < 0) || (ray.sceneObject && ray.sceneObject == this && lambda < LAMBDA_EPSILON)) {
+  if ((ray.intersection.t_value < lambda && !ray.intersection.none) || (lambda < 0) || (ray.startObject && ray.startObject == this && lambda < LAMBDA_EPSILON)) {
     return false;
   }
-
   // Find the intersection
   Point3D intersection = modelPoint + lambda*modelDirection;
   bool intersectionInBounds = intersection[0] >= -bound && intersection[0] <= bound && intersection[1] >= -bound && intersection[1] <= bound;
@@ -84,14 +82,14 @@ bool UnitSphere::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
       ld2 = lambda - sqrt(d)/a;
       if (ld1 > 0 && ld2 < 0) {
         lambda = ld1;
-      } else if (ld1 > ld2 && ld2 > 0){
+      } else if (ld1 > ld2 && ld2 > LAMBDA_EPSILON){
         lambda = ld2;
       } else {
         lambda = ld1;
       }
     }
 
-    if ((ray.intersection.t_value < lambda && !ray.intersection.none) || (ld1 < 0 && ld2 < 0) || (lambda < 0) || (ray.sceneObject && ray.sceneObject == this && lambda < LAMBDA_EPSILON)) {
+    if ((ray.intersection.t_value < lambda && !ray.intersection.none) || (ld1 < 0 && ld2 < 0) || (lambda < 0) || (ray.startObject && ray.startObject == this && lambda < LAMBDA_EPSILON)) {
       return false;
     }
 
@@ -153,14 +151,14 @@ bool GeneralQuadratic::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
       ld2 = lambda - sqrt(D) / (2.0f * A);
       if (ld1 > 0 && ld2 < 0) {
         lambda = ld1;
-      } else if (ld1 > ld2 && ld2 > 0){
+      } else if (ld1 > ld2 && ld2 > LAMBDA_EPSILON){
         lambda = ld2;
       } else {
         lambda = ld1;
       }
     }
 
-    if ((!ray.intersection.none && ray.intersection.t_value < lambda) || (ld1 < 0 && ld2 < 0) || (lambda < 0) || (ray.sceneObject && ray.sceneObject == this && lambda < LAMBDA_EPSILON)) {
+    if ((!ray.intersection.none && ray.intersection.t_value < lambda) || (ld1 < 0 && ld2 < 0) || (lambda < 0) || (ray.startObject && ray.startObject == this && lambda < LAMBDA_EPSILON)) {
       return false;
     }
 

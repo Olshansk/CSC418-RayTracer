@@ -17,6 +17,8 @@
 #include <cmath>
 #include <cstdlib>
 
+#define UNUSED_MATERIAL_PROPERTY_VALUE -1
+
 class SceneObject;
 
 #ifndef M_PI
@@ -147,18 +149,9 @@ bool colourDiff(const Colour& u, const Colour&v, double threshold);
 std::ostream& operator <<(std::ostream& o, const Colour& c);
 
 struct Material {
-  Material( Colour ambient, Colour diffuse, Colour specular, double exp,
-      double reflection, double ref_damping, double glossiness) :
-    ambient(ambient), diffuse(diffuse), specular(specular),
-    specular_exp(exp), reflection(reflection),
-    ref_damping(ref_damping), glossiness(glossiness) {}
-
-  // How glossy the surface is
-  double glossiness;
-  // Fraction of secondary illumination that is reﬂected by the surface at intersection opint
-  double reflection;
-  // The reflactive damping coefficient; less specular reflection farther away.
-  double ref_damping;
+  Material( Colour ambient, Colour diffuse, Colour specular, double exp, double reflection, double ref_damping, double n, double glossiness) :
+    ambient(ambient), diffuse(diffuse), specular(specular), specular_exp(exp),
+    reflection(reflection), ref_damping(ref_damping), n(n), glossiness(glossiness) {}
   // Ambient components for Phong shading.
   Colour ambient;
   // Diffuse components for Phong shading.
@@ -167,9 +160,20 @@ struct Material {
   Colour specular;
   // Specular expoent.
   double specular_exp;
+  // Fraction of secondary illumination that is reﬂected by the surface at intersection opint
+  double reflection;
+  // The reflactive damping coefficient; less specular reflection farther away.
+  double ref_damping;
+  // Speed of light in this medium. Used for refraction calculations. 0 means not refractive at all.
+  double n;
+   // How glossy the surface is
+  double glossiness;
 };
 
 struct Intersection {
+  Intersection() {
+    sceneObject = NULL;
+  }
   // Location of intersection.
   Point3D point;
   // Normal at the intersection.
@@ -192,10 +196,16 @@ struct Ray3D {
   Ray3D() {
     intersection.none = true;
     reflectionNumber = 0;
+    refractionNumber = 0;
+    currentMedium = NULL;
+    currentMaterial = NULL;
   }
   Ray3D( Point3D p, Vector3D v ) : origin(p), dir(v) {
     intersection.none = true;
     reflectionNumber = 0;
+    refractionNumber = 0;
+    currentMedium = NULL;
+    currentMaterial = NULL;
   }
   Ray3D(const Ray3D& other);
   // Origin and direction of the ray.
@@ -212,7 +222,12 @@ struct Ray3D {
   // avoid infinite loops when doing reflections. This value must be capped
   // to max_reflection from raytracer by the programmer.
   int reflectionNumber;
+  // Same this as reflectionNumber but for refraction
+  int refractionNumber;
   // This points to the object where the ray originated or nothing if it originated at the light
-  SceneObject* sceneObject;
+  SceneObject* startObject;
+  // This points to the object in which the ray is currently travelling. This is used for refraction. If this is NULL, it refers to the vaccum.
+  SceneObject* currentMedium;
+  Material* currentMaterial;
 };
 #endif

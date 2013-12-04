@@ -19,6 +19,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <sstream>
+#include <utility>
 
 #define ADAPTIVE_SUBSAMPLING_THRESHOLD 0.01
 
@@ -31,6 +32,7 @@ Raytracer::Raytracer() : _lightSource(NULL) {
   depth_of_field_aperature = 0;
   depth_of_field_focus_plane = 1.0;
   max_reflection = 0;
+  max_refraction = 0;
   withShadows = false;
   glossy_rays = 0;
 }
@@ -175,15 +177,18 @@ void Raytracer::traverseScene( SceneDagNode* node, Ray3D& ray, Matrix4x4 modelTo
   // transformation matrices.
   modelToWorld = modelToWorld*node->trans;
   worldToModel = node->invtrans*worldToModel;
+
   if (node->obj) {
     // Perform intersection.
     if (node->obj->intersect(ray, worldToModel, modelToWorld)) {
       ray.intersection.mat = node->mat;
+      ray.intersection.sceneObject = node->obj;
       if (RenderStyle::rstyle == SCENE_SIGNATURE) {
         ray.col = node->scene_sig_col;
       }
     }
   }
+
   // Traverse the children.
   childPtr = node->child;
   while (childPtr != NULL) {
@@ -198,15 +203,15 @@ void Raytracer::traverseScene( SceneDagNode* node, Ray3D& ray, Matrix4x4 modelTo
 }
 
 bool Raytracer::isIntersectionInShadow( Ray3D& ray, LightSource* light ) {
-    Ray3D shadowRay = light->getShadowRay(ray);
-    traverseScene(_root, shadowRay, Matrix4x4(), Matrix4x4());
-    return (!shadowRay.intersection.none && shadowRay.intersection.t_value > 0 && shadowRay.intersection.t_value <= 1);
+  Ray3D shadowRay = light->getShadowRay(ray);
+  traverseScene(_root, shadowRay, Matrix4x4(), Matrix4x4());
+  return (!shadowRay.intersection.none && shadowRay.intersection.t_value > 0 && shadowRay.intersection.t_value <= 1);
 }
 
 // Potentially TODO: Normalize t_value somehow.
-void Raytracer::applyReflection( Ray3D& ray ) {
+Colour Raytracer::getReflectionColour( Ray3D& ray ) {
   Material* mat = ray.intersection.mat;
-  if (ray.reflectionNumber < max_reflection && mat->reflection != 0) {
+  if (mat->reflection > UNUSED_MATERIAL_PROPERTY_VALUE && ray.reflectionNumber < max_reflection) {
     Ray3D reflectionRay = LightSource::getReflectionRay(ray);
     Colour reflectionColour = shadeRay(reflectionRay);
 
@@ -228,9 +233,33 @@ void Raytracer::applyReflection( Ray3D& ray ) {
       reflectionColour = specCol / glossy_rays;
     }
 
-    ray.col += mat->reflection * exp (- mat->ref_damping * reflectionRay.intersection.t_value) * reflectionColour;
-    ray.col.clamp();
+    return (exp(- mat->ref_damping * reflectionRay.intersection.t_value) * reflectionColour);
   }
+  return Colour(0, 0, 0);
+}
+
+std::pair <Colour,double> Raytracer::getRefractionColour( Ray3D& ray ) {
+if (ray.intersection.mat->n > UNUSED_MATERIAL_PROPERTY_VALUE && ray.refractionNumber < max_refraction) {
+    std::pair <Ray3D,double> refractionParams = LightSource::getRefractionRay(ray);
+    Ray3D refractionRay = refractionParams.first;
+    if (!(refractionRay.dir[0] == 0 && refractionRay.dir[1] == 0 && refractionRay.dir[2] == 0)) {
+      double reflectance = refractionParams.second;
+      Colour rfr_col = shadeRay(refractionRay);
+      return std::make_pair(rfr_col, reflectance);
+    }
+  }
+  return std::make_pair(Colour(0, 0, 0), 1.0);
+}
+
+void Raytracer::applyReflectance ( Ray3D& ray ) {
+  std::pair <Colour, double> refractionParams = getRefractionColour(ray);
+  Colour reflectionColour = getReflectionColour(ray);
+  Colour refractionColour= refractionParams.first;
+  double reflectance = refractionParams.second;
+
+  Colour refractionAndReflaction = reflectance * reflectionColour + (1.0 - reflectance) * refractionColour;
+  ray.col += ray.intersection.mat->reflection * refractionAndReflaction;
+  ray.col.clamp();
 }
 
 void Raytracer::computeShading( Ray3D& ray ) {
@@ -253,8 +282,8 @@ void Raytracer::computeShading( Ray3D& ray ) {
     ray.col += ambientCol / double(num_lights);
   }
 
-  // Apply secondary reflection
-  applyReflection(ray);
+  // Appply reflection and refraction
+  applyReflectance(ray);
 }
 
 void Raytracer::initPixelBuffer() {
@@ -280,7 +309,9 @@ void Raytracer::flushPixelBuffer( char *file_name ) {
 
 Colour Raytracer::shadeRay( Ray3D& ray ) {
   Colour col(0.0, 0.0, 0.0);
+
   traverseScene(_root, ray, Matrix4x4(), Matrix4x4());
+
   // Don't bother shading if the ray didn't hit
   // anything.
   if (!ray.intersection.none) {
@@ -463,6 +494,8 @@ void printUsage() {
     "                              a more accurate reflection). The default values is 0.\n"
     "--shadows                     including this argument adds shadows\n"
     "--glossy 10                   number of rays for reflection off glossy surfaces\n"
+    "--refraction 1                number of refraction rays for each collision opint (bigger number creates\n"
+    "                              a more accurate refraction). The default values is 0.\n"
   );
 }
 
@@ -560,6 +593,12 @@ int main(int argc, char* argv[])
     printf("Using %d glossy rays.\n", raytracer.glossy_rays);
   }
 
+  int refraction_arg = contains_option(argc, argv, "--refraction");
+  if (refraction_arg > 0) {
+    raytracer.max_refraction = atoi(argv[refraction_arg + 1]);
+    printf("Maximum refraction number is %d.\n", raytracer.max_refraction);
+  }
+
   int scene_num_arg = contains_option(argc, argv, "--scene");
   int scene_num;
   if (scene_num_arg > 0) {
@@ -575,19 +614,35 @@ int main(int argc, char* argv[])
   // Defines a material for shading.
   Material gold( Colour(0.3, 0.3, 0.3), Colour(0.75164, 0.60648, 0.22648),
       Colour(0.628281, 0.555802, 0.366065),
-      51.2, 1, 0.2, 0);
+      51.2, 1, 0.2, UNUSED_MATERIAL_PROPERTY_VALUE, UNUSED_MATERIAL_PROPERTY_VALUE);
   Material ruby( Colour(0.1745, 0.01175, 0.01175), Colour(0.61424, 0.04136, 0.04136),
       Colour(0.727811, 0.626959, 0.626959),
-      51.2, 0.2, 0, 0 );
+      51.2, UNUSED_MATERIAL_PROPERTY_VALUE, 0, UNUSED_MATERIAL_PROPERTY_VALUE, UNUSED_MATERIAL_PROPERTY_VALUE);
   Material emerald( Colour(0.0215, 0.1745, 0.0215), Colour(0.07568, 0.61424, 0.07568),
       Colour(0.633, 0.727811, 0.633),
-      51.2, 1, 0, 1.0 );
+      51.2, UNUSED_MATERIAL_PROPERTY_VALUE, 0, UNUSED_MATERIAL_PROPERTY_VALUE, 1.0);
   Material jade( Colour(0, 0, 0), Colour(0.54, 0.89, 0.63),
       Colour(0.316228, 0.316228, 0.316228),
-      12.8, 0.3, 0.2, 0 );
+      12.8, 0.3, 0.2, UNUSED_MATERIAL_PROPERTY_VALUE, UNUSED_MATERIAL_PROPERTY_VALUE);
   Material mirrorAlmost( Colour(0.2, 0.2, 0.2), Colour(0.2, 0.2, 0.2), Colour(0.2, 0.2, 0.2),
-      1, 1, 0.5, 0);
-
+      1, 1, 0.5, UNUSED_MATERIAL_PROPERTY_VALUE, UNUSED_MATERIAL_PROPERTY_VALUE);
+  Material silver( Colour(0.19225, 0.19225, 0.19225), Colour(0.50754, 0.50754, 0.50754),
+      Colour(0.508273, 0.508273, 0.508273),
+      51.2, 1, 0.2, UNUSED_MATERIAL_PROPERTY_VALUE, UNUSED_MATERIAL_PROPERTY_VALUE);
+  Material glass( Colour(0, 0, 0), Colour(0.0, 0.0, 0.0), Colour(0.0, 0.0, 0.0),
+      51.2, 1, 0.2, UNUSED_MATERIAL_PROPERTY_VALUE, UNUSED_MATERIAL_PROPERTY_VALUE);
+  Material glass1( Colour(0, 0, 0), Colour(0.0, 0.0, 0.0),
+      Colour(0.0, 0.0, 0.0),
+      0.1, 1, 0, 1.6, UNUSED_MATERIAL_PROPERTY_VALUE);
+  Material glass2( Colour(0, 0, 0), Colour(0.0, 0.0, 0.0),
+      Colour(0.0, 0.0, 0.0),
+      0.1, 1, 0, 1.3, UNUSED_MATERIAL_PROPERTY_VALUE);
+  Material blue( Colour(0.1, 0.18725, 0.1745), Colour(0.68, 0.98, 0.95),
+      Colour(0.297254, 0.30829, 0.306678),
+      0.1, 1, 0.1, UNUSED_MATERIAL_PROPERTY_VALUE, UNUSED_MATERIAL_PROPERTY_VALUE);
+  Material green( Colour(0, 0, 0), Colour(0.23, 0.95, 0.30),
+      Colour(0.316228, 0.316228, 0.316228),
+      12.8, 0.3, 0.2, UNUSED_MATERIAL_PROPERTY_VALUE, UNUSED_MATERIAL_PROPERTY_VALUE);
   if (scene_num == 1) {
     // Camera parameters.
     Point3D eye(0, 0, 1);
@@ -664,6 +719,7 @@ int main(int argc, char* argv[])
     // Render the scene
     raytracer.render(width, height, eye, view, up, fov, scene_num);
   } else if (scene_num == 4) {
+    // Defines a point light source.
     Point3D eye(0, 0.5, 1);
     Vector3D view(0, 0, -1);
     Vector3D up(0, 1, 0);
@@ -690,7 +746,46 @@ int main(int argc, char* argv[])
 
     // Render the scene
     raytracer.render(width, height, eye, view, up, fov, scene_num);
-  }
+  } else if (scene_num == 5) {
 
+    // Defines a point light source.
+    Point3D eye(0, 0, 5);
+    Vector3D view(0, 0, -1);
+    Vector3D up(0, 1, 0);
+    double fov = 60;
+
+    raytracer.addLightSource( new PointLight(Point3D(-5, 0, 5), Colour(0.9, 0.9, 0.9) ) );
+
+    SceneDagNode* plane = raytracer.addObject( new Plane(), &jade );
+    SceneDagNode* bottom_plane = raytracer.addObject( new Plane(), &blue );
+    SceneDagNode* glass_s1 = raytracer.addObject( new UnitSphere(), &glass1 );
+    SceneDagNode* glass_s2 = raytracer.addObject( new UnitSphere(), &glass2 );
+
+    double factor1[3] = { 0.2, 0.2, 0.2 };
+    double factor2[3] = { 0.8, 0.8, 0.8 };
+
+    for (int i = -3; i < 3; i++) {
+      for (int j = -3; j < 3; j++) {
+        SceneDagNode* sphere = raytracer.addObject( new UnitSphere(), &gold );
+        raytracer.translate(sphere, Vector3D(i, j, -6));
+        raytracer.scale(sphere, Point3D(0, 0, 0), factor1);
+      }
+    }
+
+    raytracer.translate(bottom_plane, Vector3D(0, -4, -2));
+    raytracer.rotate(bottom_plane, 'x', 90);
+
+    raytracer.translate(plane, Vector3D(0, 3, -10));
+    raytracer.rotate(plane, 'x', 60);
+
+    raytracer.translate(glass_s1, Vector3D(-3, 0, -2));
+    raytracer.scale(glass_s1, Point3D(0, 0, 0), factor2);
+
+    raytracer.translate(glass_s2, Vector3D(1, -1, 0));
+    raytracer.scale(glass_s2, Point3D(0, 0, 0), factor2);
+
+    // Render the scene
+    raytracer.render(width, height, eye, view, up, fov, scene_num);
+  }
   return 0;
 }
