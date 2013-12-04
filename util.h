@@ -73,6 +73,10 @@ double dot(const Point3D& u, const Vector3D& v);
 std::ostream& operator <<(std::ostream& o, const Point3D& p);
 std::ostream& operator <<(std::ostream& o, const Vector3D& v);
 
+Vector3D orthogonal(const Vector3D& u);
+Vector3D orthogonal(const Vector3D& u, const Vector3D& v);
+Vector3D randomDeviation(const Vector3D& dir, const Vector3D& planeU, const Vector3D& planeV, double randAmount);
+
 class Vector4D {
 public:
   Vector4D();
@@ -143,11 +147,14 @@ bool colourDiff(const Colour& u, const Colour&v, double threshold);
 std::ostream& operator <<(std::ostream& o, const Colour& c);
 
 struct Material {
-  Material( Colour ambient, Colour diffuse, Colour specular, double exp, double reflection, double ref_damping) :
+  Material( Colour ambient, Colour diffuse, Colour specular, double exp,
+      double reflection, double ref_damping, double glossiness) :
     ambient(ambient), diffuse(diffuse), specular(specular),
     specular_exp(exp), reflection(reflection),
-    ref_damping(ref_damping) {}
+    ref_damping(ref_damping), glossiness(glossiness) {}
 
+  // How glossy the surface is
+  double glossiness;
   // Fraction of secondary illumination that is reﬂected by the surface at intersection opint
   double reflection;
   // The reflactive damping coefficient; less specular reflection farther away.
@@ -190,6 +197,7 @@ struct Ray3D {
     intersection.none = true;
     reflectionNumber = 0;
   }
+  Ray3D(const Ray3D& other);
   // Origin and direction of the ray.
   Point3D origin;
   Vector3D dir;

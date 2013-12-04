@@ -18,7 +18,7 @@ class LightSource {
 public:
   static Ray3D getReflectionRay( Ray3D& ray );
   virtual Ray3D getShadowRay( Ray3D& ray ) = 0;
-  virtual void shade( Ray3D& ) = 0;
+  virtual void shade( Ray3D&, int glossy_rays ) = 0;
   virtual Point3D get_position() const = 0;
   virtual bool hasAmbient() { return false; }
   virtual Colour shadeAmbient(Material* mat) {}
@@ -33,11 +33,12 @@ public:
   PointLight( Point3D pos, Colour ambient, Colour diffuse, Colour specular )
   : _pos(pos), _col_ambient(ambient), _col_diffuse(diffuse),
   _col_specular(specular) {}
-  void shade( Ray3D& ray );
+  void shade( Ray3D& ray, int glossy_rays);
   Ray3D getShadowRay( Ray3D& ray );
   Point3D get_position() const { return _pos; }
   bool hasAmbient() { return true; }
   Colour shadeAmbient(Material* mat);
+  Colour shadeAmbient(Vector3D r_vec, Vector3D incident_vec, Material* mat) ;
 
 private:
   Point3D _pos;

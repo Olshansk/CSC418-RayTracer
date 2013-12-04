@@ -208,6 +208,29 @@ std::ostream& operator <<(std::ostream& s, const Vector3D& v)
   return s << "v(" << v[0] << "," << v[1] << "," << v[2] << ")";
 }
 
+Vector3D orthogonal(const Vector3D& u) {
+  Vector3D ortho;
+  if (u[2] != 0 || u[1] != 0)) {
+    ortho = Vector3D(0, -u[2], u[1]);
+  } else {
+    ortho = Vector3D(u[1], -u[0], 0);
+  }
+  ortho.normalize();
+  return ortho;
+}
+
+Vector3D orthogonal(const Vector3D& u, const Vector3D& v) {
+  Vector3D ortho = u.cross(v);
+  ortho.normalize();
+  return ortho;
+}
+
+Vector3D randomDeviation(const Vector3D& dir, const Vector3D& planeU, const Vector3D& planeV, double randAmount) {
+  Vector3D perturbed = randAmount * (RANDOM - 0.5) * planeU + randAmount * (RANDOM - 0.5) * planeV + dir;
+  perturbed.normalize();
+  return perturbed;
+}
+
 Colour::Colour() {
   m_data[0] = 0.0;
   m_data[1] = 0.0;
@@ -437,4 +460,13 @@ std::ostream& operator <<(std::ostream& os, const Matrix4x4& M) {
     << M[2][2] << " " << M[2][3] << "]" << std::endl
     << "[" << M[3][0] << " " << M[3][1] << " "
     << M[3][2] << " " << M[3][3] << "]";
+}
+
+Ray3D::Ray3D(const Ray3D& other) {
+  origin = other.origin;
+  dir = other.dir;
+  intersection = other.intersection;
+  col = other.col;
+  reflectionNumber = other.reflectionNumber;
+  sceneObject = other.sceneObject;
 }

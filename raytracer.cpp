@@ -32,6 +32,7 @@ Raytracer::Raytracer() : _lightSource(NULL) {
   depth_of_field_focus_plane = 1.0;
   max_reflection = 0;
   withShadows = false;
+  glossy_rays = 0;
 }
 
 Raytracer::~Raytracer() {
@@ -209,6 +210,24 @@ void Raytracer::applyReflection( Ray3D& ray ) {
     Ray3D reflectionRay = LightSource::getReflectionRay(ray);
     Colour reflectionColour = shadeRay(reflectionRay);
 
+    if (glossy_rays != 0 && mat->glossiness != 0) {
+      Vector3D ortho1 = orthogonal(reflectionRay.dir);
+      Vector3D ortho2 = orthogonal(reflectionRay.dir, ortho1);
+
+      Colour specCol = Colour();
+
+      for (int i = 0; i < glossy_rays; i++) {
+        Vector3D rand_dir = randomDeviation(reflectionRay.dir, ortho1, ortho2, mat->glossiness);
+        Ray3D rand_ray = Ray3D(reflectionRay);
+        rand_ray.dir = rand_dir;
+        rand_ray.col = Colour();
+        rand_ray.intersection.none = true;
+        specCol += shadeRay(rand_ray);
+      }
+
+      reflectionColour = specCol / glossy_rays;
+    }
+
     ray.col += mat->reflection * exp (- mat->ref_damping * reflectionRay.intersection.t_value) * reflectionColour;
     ray.col.clamp();
   }
@@ -226,7 +245,7 @@ void Raytracer::computeShading( Ray3D& ray ) {
 
     // Each lightSource provides its own shading function.
     if (!withShadows || !isIntersectionInShadow(ray, curLight->light)) {
-      curLight->light->shade(ray);
+      curLight->light->shade(ray, glossy_rays);
     }
   }
 
@@ -443,6 +462,7 @@ void printUsage() {
     "--reflection 1                number of reflection rays for each collision opint (bigger number creates\n"
     "                              a more accurate reflection). The default values is 0.\n"
     "--shadows                     including this argument adds shadows\n"
+    "--glossy 10                   number of rays for reflection off glossy surfaces\n"
   );
 }
 
@@ -534,6 +554,12 @@ int main(int argc, char* argv[])
     printf("Rendering scene with shadows.\n");
   }
 
+  int glossy_arg = contains_option(argc, argv, "--glossy");
+  if (glossy_arg > 0) {
+    raytracer.glossy_rays = atoi(argv[glossy_arg + 1]);
+    printf("Using %d glossy rays.\n", raytracer.glossy_rays);
+  }
+
   int scene_num_arg = contains_option(argc, argv, "--scene");
   int scene_num;
   if (scene_num_arg > 0) {
@@ -549,18 +575,18 @@ int main(int argc, char* argv[])
   // Defines a material for shading.
   Material gold( Colour(0.3, 0.3, 0.3), Colour(0.75164, 0.60648, 0.22648),
       Colour(0.628281, 0.555802, 0.366065),
-      51.2, 1, 0.2);
+      51.2, 1, 0.2, 0);
   Material ruby( Colour(0.1745, 0.01175, 0.01175), Colour(0.61424, 0.04136, 0.04136),
       Colour(0.727811, 0.626959, 0.626959),
-      51.2, 0.2, 0 );
+      51.2, 0.2, 0, 0 );
   Material emerald( Colour(0.0215, 0.1745, 0.0215), Colour(0.07568, 0.61424, 0.07568),
       Colour(0.633, 0.727811, 0.633),
-      51.2, 1, 0 );
+      51.2, 1, 0, 1.0 );
   Material jade( Colour(0, 0, 0), Colour(0.54, 0.89, 0.63),
       Colour(0.316228, 0.316228, 0.316228),
-      12.8, 0.3, 0.2 );
+      12.8, 0.3, 0.2, 0 );
   Material mirrorAlmost( Colour(0.2, 0.2, 0.2), Colour(0.2, 0.2, 0.2), Colour(0.2, 0.2, 0.2),
-      1, 1, 0.5);
+      1, 1, 0.5, 0);
 
   if (scene_num == 1) {
     // Camera parameters.

@@ -12,11 +12,16 @@
 #include "light_source.h"
 #include "render_style.h"
 
-void PointLight::shade( Ray3D& ray) {
+#define GLOSS_LIGHT_RAY_MULTIPLIER 10
+
+void PointLight::shade( Ray3D& ray, int glossy_rays ) {
   Intersection intersection = ray.intersection;
   Material* mat = intersection.mat;
   Vector3D normal = intersection.normal;
   Vector3D incident_vec = ray.dir;
+
+  // Since light shading doesn't spawn new rays, we can take the liberty to use more rays
+  glossy_rays = glossy_rays * GLOSS_LIGHT_RAY_MULTIPLIER;
 
   Vector3D s_vec = get_position() - intersection.point;
   s_vec.normalize();
@@ -26,11 +31,29 @@ void PointLight::shade( Ray3D& ray) {
   Colour col = ray.col;
   col += fmax(0, normal.dot(s_vec)) * (mat->diffuse * _col_diffuse);
   if (RenderStyle::rstyle != AMBIENT_DIFFUSE) {
-    col += pow(fmax(0, -r_vec.dot(incident_vec)), mat->specular_exp) * (mat->specular * _col_specular);
+    if (glossy_rays != 0 && mat->glossiness != 0) {
+      Vector3D ortho1 = orthogonal(r_vec);
+      Vector3D ortho2 = orthogonal(r_vec, ortho1);
+
+      Colour specCol = Colour();
+
+      for (int i = 0; i < glossy_rays; i++) {
+        Vector3D rand_r_vec = randomDeviation(r_vec, ortho1, ortho2, mat->glossiness);
+        specCol += shadeAmbient(r_vec, incident_vec, mat);
+      }
+
+      col += specCol / glossy_rays;
+    } else {
+      col += shadeAmbient(r_vec, incident_vec, mat);
+    }
   }
 
   col.clamp();
   ray.col = col;
+}
+
+Colour PointLight::shadeAmbient(Vector3D r_vec, Vector3D incident_vec, Material* mat) {
+  return pow(fmax(0, -r_vec.dot(incident_vec)), mat->specular_exp) * (mat->specular * _col_specular);
 }
 
 Colour PointLight::shadeAmbient(Material* mat) {
