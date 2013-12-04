@@ -77,6 +77,7 @@ std::ostream& operator <<(std::ostream& o, const Vector3D& v);
 
 Vector3D orthogonal(const Vector3D& u);
 Vector3D orthogonal(const Vector3D& u, const Vector3D& v);
+//Get a vector slightly deviated from dir, along the plane composed of planeU and planeV
 Vector3D randomDeviation(const Vector3D& dir, const Vector3D& planeU, const Vector3D& planeV, double randAmount);
 
 class Vector4D {

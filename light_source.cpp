@@ -36,33 +36,37 @@ void PointLight::shade( Ray3D& ray, int glossy_rays ) {
   Vector3D s_vec = get_position() - intersection.point;
   s_vec.normalize();
 
+  // The perfect reflection direction
   Vector3D r_vec = 2.0 * (normal.dot(s_vec)) * normal - s_vec;
 
-  Colour col = ray.col;
-  col += fmax(0, normal.dot(s_vec)) * (mat->diffuse * _col_diffuse);
+  // Apply diffuse component
+  ray.col += fmax(0, normal.dot(s_vec)) * (mat->diffuse * _col_diffuse);
+
+  // Apply specular component
   if (RenderStyle::rstyle != AMBIENT_DIFFUSE) {
+    // Randomize perfect reflection direction for glossy materials
     if (glossy_rays != 0 && mat->glossiness > UNUSED_MATERIAL_PROPERTY_VALUE) {
       Vector3D ortho1 = orthogonal(r_vec);
       Vector3D ortho2 = orthogonal(r_vec, ortho1);
 
       Colour specCol = Colour();
 
+      // Colour each random ray
       for (int i = 0; i < glossy_rays; i++) {
         Vector3D rand_r_vec = randomDeviation(r_vec, ortho1, ortho2, mat->glossiness);
-        specCol += shadeAmbient(r_vec, incident_vec, mat);
+        specCol += shadeSpecular(r_vec, incident_vec, mat);
       }
 
-      col += specCol / glossy_rays;
+      ray.col += specCol / glossy_rays;
     } else {
-      col += shadeAmbient(r_vec, incident_vec, mat);
+      ray.col += shadeSpecular(r_vec, incident_vec, mat);
     }
   }
 
-  col.clamp();
-  ray.col = col;
+  ray.col.clamp();
 }
 
-Colour PointLight::shadeAmbient(Vector3D r_vec, Vector3D incident_vec, Material* mat) {
+Colour PointLight::shadeSpecular(Vector3D r_vec, Vector3D incident_vec, Material* mat) {
   return pow(fmax(0, -r_vec.dot(incident_vec)), mat->specular_exp) * (mat->specular * _col_specular);
 }
 

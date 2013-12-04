@@ -22,7 +22,9 @@ public:
   virtual Ray3D getShadowRay( Ray3D& ray ) = 0;
   virtual void shade( Ray3D&, int glossy_rays ) = 0;
   virtual Point3D get_position() const = 0;
+  // Determine if a light contributes to the ambient light of the entire scene
   virtual bool hasAmbient() { return false; }
+  // Get the colour that the light contributes to the ambient light of the entire scene
   virtual Colour shadeAmbient(Material* mat) {}
 };
 
@@ -40,7 +42,8 @@ public:
   Point3D get_position() const { return _pos; }
   bool hasAmbient() { return true; }
   Colour shadeAmbient(Material* mat);
-  Colour shadeAmbient(Vector3D r_vec, Vector3D incident_vec, Material* mat) ;
+  // Get specular colour given the indicent vector and the perfect reflection vector (r_vec)
+  Colour shadeSpecular(Vector3D r_vec, Vector3D incident_vec, Material* mat) ;
 
 private:
   Point3D _pos;
