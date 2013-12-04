@@ -795,7 +795,7 @@ int main(int argc, char* argv[])
     Vector3D up(0, 1, 0);
     double fov = 60;
 
-    raytracer.addLightSource( new PointLight(Point3D(0, 0, 3), Colour(0.9, 0.9, 0.9)));
+    raytracer.addLightSource( new PointLight(Point3D(3, 0, 3), Colour(0.9, 0.9, 0.9)));
 
     // Add a unit square into the scene with material mat.
     SceneDagNode* sphere = raytracer.addObject( new GeneralQuadratic(1, 1, 1, 0, 0, 0, 0, 0, 0, -1), &gold );
