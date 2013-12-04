@@ -463,7 +463,7 @@ void Raytracer::render( int width, int height, Point3D eye, Vector3D view,
     {
       rows_completed++;
       if (rows_completed % 10 == 0) {
-        printf("Columns completed: %d\n", rows_completed);
+        printf("Rows completed: %d\n", rows_completed);
       }
     }
   }
