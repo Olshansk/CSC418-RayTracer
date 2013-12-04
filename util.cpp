@@ -438,18 +438,11 @@ Vector3D operator *(const Matrix4x4& M, const Vector3D& v) {
 }
 
 Point3D operator *(const Matrix4x4& M, const Point3D& p) {
-   try
-  {
   return Point3D(
       p[0] * M[0][0] + p[1] * M[0][1] + p[2] * M[0][2] + M[0][3],
       p[0] * M[1][0] + p[1] * M[1][1] + p[2] * M[1][2] + M[1][3],
       p[0] * M[2][0] + p[1] * M[2][1] + p[2] * M[2][2] + M[2][3]);
   }
-  catch (int e)
-  {
-    printf("CAUGHT THE ERROR.\n");
-  }
-
 }
 
 Vector3D transNorm(const Matrix4x4& M, const Vector3D& n) {

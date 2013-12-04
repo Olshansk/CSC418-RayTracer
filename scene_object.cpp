@@ -14,7 +14,7 @@
 #include "scene_object.h"
 #include "render_style.h"
 
-#define LAMBDA_EPSILON 0.000001
+#define LAMBDA_EPSILON 0.0000000000001
 
 // Finds intersection for UnitSquare, which is
 // defined on the xy-plane, with vertices (0.5, 0.5, 0),

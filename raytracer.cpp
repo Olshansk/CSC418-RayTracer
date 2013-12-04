@@ -185,7 +185,6 @@ void Raytracer::traverseScene( SceneDagNode* node, Ray3D& ray, Matrix4x4 modelTo
   // transformation matrices.
   modelToWorld = modelToWorld*node->trans;
   worldToModel = node->invtrans*worldToModel;
-  // modelToWorld = worldToModel;
 
   if (node->obj) {
     // Perform intersection.
@@ -262,12 +261,12 @@ if (ray.intersection.mat->n > UNUSED_MATERIAL_PROPERTY_VALUE && ray.refractionNu
 
 void Raytracer::applyReflectance ( Ray3D& ray ) {
   std::pair <Colour, double> refractionParams = getRefractionColour(ray);
-  Colour rfl_col = getReflectionColour(ray);
-  Colour rfr_col = refractionParams.first;
+  Colour reflectionColour = getReflectionColour(ray);
+  Colour refractionColour= refractionParams.first;
   double reflectance = refractionParams.second;
 
-  Colour rfr_rfl = reflectance * rfl_col + (1.0 - reflectance) * rfr_col;
-  ray.col = ray.col + ray.intersection.mat->reflection * rfr_rfl;
+  Colour refractionAndReflaction = reflectance * reflectionColour + (1.0 - reflectance) * refractionColour;
+  ray.col = ray.col + ray.intersection.mat->reflection * refractionAndReflaction;
   ray.col.clamp();
 }
 
@@ -519,27 +518,8 @@ int contains_option(int argc, char* argv[], const char* option) {
   return -1;
 }
 
-
-
-
-void handler(int sig) {
-
-  void *array[10];
-  size_t size;
-
-  // get void*'s for all entries on the stack
-  size = backtrace(array, 10);
-
-  // print out all the frames to stderr
-  fprintf(stderr, "Error: signal %d:\n", sig);
-  backtrace_symbols_fd(array, size, STDERR_FILENO);
-  exit(1);
-}
-
 int main(int argc, char* argv[])
 {
-  signal(SIGSEGV, handler);   // install our handler
-
   // Build your scene and setup your camera here, by calling
   // functions from Raytracer.  The code here sets up an example
   // scene and renders it from two different view points, DO NOT
