@@ -14,6 +14,7 @@
 #include "scene_object.h"
 #include "render_style.h"
 
+// This value is used to avoid a cancer like effect for shadows, reflections and refractions.
 #define LAMBDA_EPSILON 0.000001
 
 // Finds intersection for UnitSquare, which is
@@ -23,10 +24,11 @@
 bool UnitSquare::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
     const Matrix4x4& modelToWorld ) {
 
-  // Transform ray into object space
+  // Convert the origin and direction to model coordinates
   Point3D modelPoint = worldToModel*ray.origin;
   Vector3D modelDirection = worldToModel*ray.dir;
 
+  // The plane's normal and
   Vector3D normal = Vector3D(0, 0, 1);
   Point3D q1 = Point3D(0, 0, 0);
 
@@ -61,7 +63,7 @@ bool UnitSphere::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
   // The sphere's radius
   double radius = 1;
 
-  // Transform ray into object space
+  // Convert the origin and direction to model coordinates
   Point3D modelPoint = worldToModel*ray.origin;
   Vector3D modelDirection = worldToModel*ray.dir;
 
@@ -72,7 +74,7 @@ bool UnitSphere::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
   double d = b * b - a * c;
   double didIntersect = d >= 0;
 
-  // Find how close the intersection is
+  // Determine how close the intersection is
   if (d >= 0) {
     double lambda = - b / a;
     double ld1, ld2;
@@ -89,6 +91,7 @@ bool UnitSphere::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
       }
     }
 
+    // Return if this collision should not be considered as an intersection
     if ((ray.intersection.t_value < lambda && !ray.intersection.none) || (ld1 < 0 && ld2 < 0) || (lambda < 0) || (ray.startObject && ray.startObject == this && lambda < LAMBDA_EPSILON)) {
       return false;
     }
@@ -110,13 +113,15 @@ bool UnitSphere::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
   return didIntersect;
 }
 
-// reference: http://mrl.nyu.edu/~perlin/courses/fall2013/sep25b/
+// Generate  Quadratic Shapes, centered at the origin
 bool GeneralQuadratic::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
       const Matrix4x4& modelToWorld ) {
 
+  // Convert the origin and direction to model coordinates
   Point3D point = worldToModel * ray.origin;
   Vector3D dir = worldToModel * ray.dir;
 
+  // Extract the (x,y,z) variables of the origin and direction for easier calculations
   double wx = dir[0];
   double wy = dir[1];
   double wz = dir[2];
@@ -125,6 +130,7 @@ bool GeneralQuadratic::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
   double vy = point[1];
   double vz = point[2];
 
+  // Determine the quadratic equation parameters to determine if an intersection occurs
   double A = a * wx * wx + b * wy * wy + c * wz * wz
            + d * wy * wz + e * wz * wx + f * wx * wy;
   double B = 2.0f * (a * vx * wx + b * vy * wy + c * vz * wz)
@@ -141,7 +147,7 @@ bool GeneralQuadratic::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
   double D = B * B - 4 * A * C;
   bool didIntersect = D >= 0;
 
-  // Find how close the intersection is
+  // Determine how close the intersection is
   if (didIntersect) {
     double lambda = - B / (2.0f * A);
     double ld1, ld2;
@@ -158,6 +164,7 @@ bool GeneralQuadratic::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
       }
     }
 
+    // Return if this collision should not be considered as an intersection
     if ((!ray.intersection.none && ray.intersection.t_value < lambda) || (ld1 < 0 && ld2 < 0) || (lambda < 0) || (ray.startObject && ray.startObject == this && lambda < LAMBDA_EPSILON)) {
       return false;
     }
@@ -169,6 +176,8 @@ bool GeneralQuadratic::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
     double y = intersection[1];
     double z = intersection[2];
 
+
+    // Determine the outward facing normal at that point of the surface
     Vector3D normal = Vector3D( 2.0f * a * x + e * z + f * y + g,
                                 2.0f * b * y + d * z + f * x + h,
                                 2.0f * c * z + d * y + e * x + i );
