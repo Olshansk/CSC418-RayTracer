@@ -173,8 +173,7 @@ Matrix4x4 Raytracer::initInvViewMatrix( Point3D eye, Vector3D view,
 
 void Raytracer::traverseScene( SceneDagNode* node, Ray3D& ray, Matrix4x4 modelToWorld, Matrix4x4 worldToModel) {
   SceneDagNode *childPtr;
-  // Applies transformation of the current node to the global
-  // transformation matrices.
+  // Applies transformation of the current node to the transformation matrices.
   modelToWorld = modelToWorld*node->trans;
   worldToModel = node->invtrans*worldToModel;
 
@@ -196,8 +195,7 @@ void Raytracer::traverseScene( SceneDagNode* node, Ray3D& ray, Matrix4x4 modelTo
     childPtr = childPtr->next;
   }
 
-  // Removes transformation of the current node from the global
-  // transformation matrices.
+  // Removes transformation of the current node from the transformation matrices.
   worldToModel = node->trans*worldToModel;
   modelToWorld = modelToWorld*node->invtrans;
 }
@@ -212,16 +210,20 @@ bool Raytracer::isIntersectionInShadow( Ray3D& ray, LightSource* light ) {
 Colour Raytracer::getReflectionColour( Ray3D& ray ) {
   Material* mat = ray.intersection.mat;
   if (mat->reflection > UNUSED_MATERIAL_PROPERTY_VALUE && ray.reflectionNumber < max_reflection) {
+    // Get the perfect reflection direction
     Ray3D reflectionRay = LightSource::getReflectionRay(ray);
     Colour reflectionColour = shadeRay(reflectionRay);
 
+    // Randomize perfect reflection direction for glossy materials
     if (glossy_rays != 0 && mat->glossiness > UNUSED_MATERIAL_PROPERTY_VALUE) {
       Vector3D ortho1 = orthogonal(reflectionRay.dir);
       Vector3D ortho2 = orthogonal(reflectionRay.dir, ortho1);
 
       Colour specCol = Colour();
 
+      // Colour each random ray
       for (int i = 0; i < glossy_rays; i++) {
+        // Duplicate the perfect reflection ray, but randomize the direction a little
         Vector3D rand_dir = randomDeviation(reflectionRay.dir, ortho1, ortho2, mat->glossiness);
         Ray3D rand_ray = Ray3D(reflectionRay);
         rand_ray.dir = rand_dir;
@@ -267,6 +269,7 @@ void Raytracer::computeShading( Ray3D& ray ) {
   int num_lights = 0;
 
   for (LightListNode* curLight = _lightSource; curLight != NULL; curLight = curLight->next) {
+    // Gather all the ambient components from all the lights
     if (curLight->light->hasAmbient()) {
       ambientCol += curLight->light->shadeAmbient(ray.intersection.mat);
       num_lights ++;
@@ -278,6 +281,7 @@ void Raytracer::computeShading( Ray3D& ray ) {
     }
   }
 
+  // Apply the ambient component
   if (num_lights != 0) {
     ray.col += ambientCol / double(num_lights);
   }
@@ -320,8 +324,6 @@ Colour Raytracer::shadeRay( Ray3D& ray ) {
     }
     col = ray.col;
   }
-  // You'll want to call shadeRay recursively (with a different ray,
-  // of course) here to implement reflection/refraction effects.
 
   return col;
 }
@@ -336,6 +338,7 @@ Colour Raytracer::shadeSingleViewRay(Matrix4x4 viewToWorld, Point3D imagePlane, 
 }
 
 Colour Raytracer::shadeViewRay(Matrix4x4 viewToWorld, Point3D imagePlane, Point3D origin) {
+  // If depth of field enabled, shoot out random rays within the camera's aperature
   if (depth_of_field) {
     Colour col = Colour();
     for (int m = 0; m < depth_of_field_rays; m++) {
@@ -377,6 +380,8 @@ void Raytracer::render( int width, int height, Point3D eye, Vector3D view,
   #pragma omp parallel for
   for (int i = 0; i < _scrHeight; i++) {
     Colour (*aaCache)[2];
+    // If we are using more than 4 anti-aliased, then we will be sampling the corners,
+    // so we can save some of those computations in the aaCache.
     if (antialias && antialias_rays > 4) {
       aaCache = new Colour[_scrWidth][2];
     }
@@ -398,6 +403,8 @@ void Raytracer::render( int width, int height, Point3D eye, Vector3D view,
         if (antialias_rays > 4) {
           // Bottom left pixel
           Colour col1;
+          // We can use the computation from the pixel to the left if we aren't
+          // on the left-most pixel
           if (j != 0) {
             col1 = aaCache[j - 1][0];
           } else {
@@ -420,6 +427,8 @@ void Raytracer::render( int width, int height, Point3D eye, Vector3D view,
 
           // Top left pixel
           Colour col4;
+          // We can use the computation from the pixel to the left if we aren't
+          // on the left-most pixel
           if (j != 0) {
             col4 = aaCache[j - 1][1];
           } else {
@@ -435,6 +444,7 @@ void Raytracer::render( int width, int height, Point3D eye, Vector3D view,
               colourDiff(col1, col4, threshold) || colourDiff(col2, col3, threshold) ||
               colourDiff(col2, col4, threshold) || colourDiff(col3, col4, threshold);
 
+          // If the corners are different, then shoot more random rays to reduce aliasing.
           if (cornersDifferent) {
             col = subsampleRay(imagePlaneOrig, imagePlane, factor, viewToWorld, origin);
             col += col1 + col2 + col3 + col4;
@@ -499,6 +509,7 @@ void printUsage() {
   );
 }
 
+// Check if any of the command line arguments contain a particular option
 int contains_option(int argc, char* argv[], const char* option) {
   for (int x = 0; x < argc; x++) {
     if (strcmp(argv[x], option) == 0) {
@@ -641,6 +652,7 @@ int main(int argc, char* argv[])
   Material green( Colour(0, 0, 0), Colour(0.23, 0.95, 0.30),
       Colour(0.316228, 0.316228, 0.316228),
       12.8, 0.3, 0.2, UNUSED_MATERIAL_PROPERTY_VALUE, UNUSED_MATERIAL_PROPERTY_VALUE);
+
   if (scene_num == 1) {
     // Camera parameters.
     Point3D eye(0, 0, 1);
@@ -732,7 +744,6 @@ int main(int argc, char* argv[])
 
     raytracer.addLightSource( new PointLight(Point3D(-1, 5, -10),
           Colour(0.9, 0.9, 0.9) ) );
-
 
     SceneDagNode* sphere1 = raytracer.addObject( new UnitSphere(), &emerald );
     SceneDagNode* sphere2 = raytracer.addObject( new UnitSphere(), &ruby );
