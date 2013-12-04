@@ -22,7 +22,6 @@
 #include <utility>
 
 #define ADAPTIVE_SUBSAMPLING_THRESHOLD 0.01
-#define UNUSED_MATERIAL_PROPERTY_VALUE -1
 
 Raytracer::Raytracer() : _lightSource(NULL) {
   _root = new SceneDagNode();
@@ -720,9 +719,8 @@ int main(int argc, char* argv[])
     // Render the scene
     raytracer.render(width, height, eye, view, up, fov, scene_num);
   } else if (scene_num == 4) {
-
     // Defines a point light source.
-    Point3D eye(0, 0, 1);
+    Point3D eye(0, 0.5, 1);
     Vector3D view(0, 0, -1);
     Vector3D up(0, 1, 0);
     double fov = 60;

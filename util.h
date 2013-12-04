@@ -17,6 +17,8 @@
 #include <cmath>
 #include <cstdlib>
 
+#define UNUSED_MATERIAL_PROPERTY_VALUE -1
+
 class SceneObject;
 
 #ifndef M_PI
