@@ -752,11 +752,11 @@ int main(int argc, char* argv[])
 
     // Defines a point light source.
     Point3D eye(0, 0, 5);
-    Vector3D view(0, 0, -1);
+    Vector3D view(0, 0.1, -1);
     Vector3D up(0, 1, 0);
     double fov = 60;
 
-    raytracer.addLightSource( new PointLight(Point3D(-5, 0, 5), Colour(0.9, 0.9, 0.9) ) );
+    raytracer.addLightSource( new PointLight(Point3D(-5, 2, 5), Colour(0.9, 0.9, 0.9) ) );
 
     SceneDagNode* plane = raytracer.addObject( new Plane(), &jade );
     SceneDagNode* bottom_plane = raytracer.addObject( new Plane(), &blue );
@@ -775,10 +775,10 @@ int main(int argc, char* argv[])
     }
 
     raytracer.translate(bottom_plane, Vector3D(0, -4, -2));
-    raytracer.rotate(bottom_plane, 'x', 90);
+    raytracer.rotate(bottom_plane, 'x', -90);
 
-    raytracer.translate(plane, Vector3D(0, 3, -10));
-    raytracer.rotate(plane, 'x', 60);
+    raytracer.translate(plane, Vector3D(0, 1000, -10));
+    raytracer.rotate(plane, 'x', 90);
 
     raytracer.translate(glass_s1, Vector3D(-3, 0, -2));
     raytracer.scale(glass_s1, Point3D(0, 0, 0), factor2);
