@@ -21,13 +21,6 @@
 #include <sstream>
 #include <utility>
 
-#include <stdio.h>
-#include <execinfo.h>
-#include <signal.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <csignal>
-
 #define ADAPTIVE_SUBSAMPLING_THRESHOLD 0.01
 #define UNUSED_MATERIAL_PROPERTY_VALUE -1
 
@@ -266,7 +259,7 @@ void Raytracer::applyReflectance ( Ray3D& ray ) {
   double reflectance = refractionParams.second;
 
   Colour refractionAndReflaction = reflectance * reflectionColour + (1.0 - reflectance) * refractionColour;
-  ray.col = ray.col + ray.intersection.mat->reflection * refractionAndReflaction;
+  ray.col += ray.intersection.mat->reflection * refractionAndReflaction;
   ray.col.clamp();
 }
 
@@ -324,7 +317,6 @@ Colour Raytracer::shadeRay( Ray3D& ray ) {
   // anything.
   if (!ray.intersection.none) {
     if (RenderStyle::rstyle == PHONG || RenderStyle::rstyle == AMBIENT_DIFFUSE) {
-
       computeShading(ray);
     }
     col = ray.col;
@@ -728,55 +720,6 @@ int main(int argc, char* argv[])
     // Render the scene
     raytracer.render(width, height, eye, view, up, fov, scene_num);
   } else if (scene_num == 4) {
-    // Defines a point light source.
-    Point3D eye(0, 0, 1);
-    Vector3D view(0, 0, -1);
-    Vector3D up(0, 1, 0);
-    double fov = 60;
-
-    raytracer.addLightSource( new PointLight(Point3D(0, 0, 5),
-          Colour(0.9, 0.9, 0.9) ) );
-
-    // Add a unit square into the scene with material mat.
-    // SceneDagNode* sphere = raytracer.addObject( new GeneralQuadratic(1, 1, 1, 0, 0, 0, 0, 0, 0, -1), &gold );
-    SceneDagNode* cone = raytracer.addObject( new GeneralQuadratic(1, -1, 1, 0, 0, 0, 0, 0, 0, -1), &gold );
-    // SceneDagNode* cylinder = raytracer.addObject( new GeneralQuadratic(1, 0, 1, 0, 0, 0, 0, 0, 0, -1), &gold );
-    SceneDagNode* plane = raytracer.addObject( new UnitSquare(), &jade );
-
-    // Apply some transformations to the unit square.
-
-    double factor1[3] = { 1.0, 3.0, 1.0 };
-    double factor2[3] = { 6.0, 6.0, 6.0 };
-    double factor3[3] = { 1, 1, 1 };
-
-    // raytracer.translate(sphere, Vector3D(0, 0, -5));
-    // raytracer.rotate(sphere, 'x', -45);
-    // raytracer.rotate(sphere, 'z', 45);
-    // raytracer.scale(sphere, Point3D(0, 0, 0), factor1);
-
-    raytracer.translate(cone, Vector3D(0, 0, -5));
-    // raytracer.rotate(cone, 'x', -45);
-    // raytracer.rotate(cone, 'z', 45);
-    raytracer.scale(cone, Point3D(0, 0, 0), factor1);
-
-    // raytracer.translate(cylinder, Vector3D(0, 0, -5));
-    // raytracer.rotate(cylinder, 'x', -45);
-    // raytracer.rotate(cylinder, 'z', 45);
-    // raytracer.scale(cylinder, Point3D(0, 0, 0), factor3);
-
-    raytracer.translate(plane, Vector3D(0, 0, -7));
-    raytracer.rotate(plane, 'z', 45);
-    raytracer.scale(plane, Point3D(0, 0, 0), factor2);
-
-    // Render the scene, feel free to make the image smaller for
-    // testing purposes.
-    raytracer.render(width, height, eye, view, up, fov, scene_num);
-
-    // Render it from a different point of view.
-    Point3D eye2(4, 2, 1);
-    Vector3D view2(-4, -2, -6);
-    raytracer.render(width, height, eye2, view2, up, fov, scene_num);
-  } else if (scene_num == 5) {
 
     // Defines a point light source.
     Point3D eye(0, 0, 1);
@@ -805,7 +748,7 @@ int main(int argc, char* argv[])
 
     // Render the scene
     raytracer.render(width, height, eye, view, up, fov, scene_num);
-  } else if (scene_num == 6) {
+  } else if (scene_num == 5) {
 
     // Defines a point light source.
     Point3D eye(0, 0, 5);

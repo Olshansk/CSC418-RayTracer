@@ -28,8 +28,6 @@ bool UnitSquare::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
   Vector3D modelDirection = worldToModel*ray.dir;
 
   Vector3D normal = Vector3D(0, 0, 1);
-
-  normal.normalize();
   Point3D q1 = Point3D(0, 0, 0);
 
   // Find how close the intersection is
