@@ -41,7 +41,7 @@ void PointLight::shade( Ray3D& ray, int glossy_rays ) {
   Colour col = ray.col;
   col += fmax(0, normal.dot(s_vec)) * (mat->diffuse * _col_diffuse);
   if (RenderStyle::rstyle != AMBIENT_DIFFUSE) {
-    if (glossy_rays != 0 && mat->glossiness != 0) {
+    if (glossy_rays != 0 && mat->glossiness > UNUSED_MATERIAL_PROPERTY_VALUE) {
       Vector3D ortho1 = orthogonal(r_vec);
       Vector3D ortho2 = orthogonal(r_vec, ortho1);
 

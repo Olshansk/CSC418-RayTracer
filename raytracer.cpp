@@ -215,7 +215,7 @@ Colour Raytracer::getReflectionColour( Ray3D& ray ) {
     Ray3D reflectionRay = LightSource::getReflectionRay(ray);
     Colour reflectionColour = shadeRay(reflectionRay);
 
-    if (glossy_rays != 0 && mat->glossiness != 0) {
+    if (glossy_rays != 0 && mat->glossiness > UNUSED_MATERIAL_PROPERTY_VALUE) {
       Vector3D ortho1 = orthogonal(reflectionRay.dir);
       Vector3D ortho2 = orthogonal(reflectionRay.dir, ortho1);
 
