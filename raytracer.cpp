@@ -629,8 +629,6 @@ int main(int argc, char* argv[])
   Material silver( Colour(0.19225, 0.19225, 0.19225), Colour(0.50754, 0.50754, 0.50754),
       Colour(0.508273, 0.508273, 0.508273),
       51.2, 1, 0.2, UNUSED_MATERIAL_PROPERTY_VALUE, UNUSED_MATERIAL_PROPERTY_VALUE);
-  Material glass( Colour(0, 0, 0), Colour(0.0, 0.0, 0.0), Colour(0.0, 0.0, 0.0),
-      51.2, 1, 0.2, UNUSED_MATERIAL_PROPERTY_VALUE, UNUSED_MATERIAL_PROPERTY_VALUE);
   Material glass1( Colour(0, 0, 0), Colour(0.0, 0.0, 0.0),
       Colour(0.0, 0.0, 0.0),
       0.1, 1, 0, 1.6, UNUSED_MATERIAL_PROPERTY_VALUE);
@@ -747,67 +745,6 @@ int main(int argc, char* argv[])
     // Render the scene
     raytracer.render(width, height, eye, view, up, fov, scene_num);
   } else if (scene_num == 5) {
-    // Defines a point light source.
-    Point3D eye(0, 0, 5);
-    Vector3D view(0, 0, -1);
-    Vector3D up(0, 1, 0);
-    double fov = 60;
-
-    raytracer.addLightSource( new PointLight(Point3D(0, 0, 3), Colour(0.9, 0.9, 0.9)));
-
-    // Add a unit square into the scene with material mat.
-    SceneDagNode* sphere = raytracer.addObject( new GeneralQuadratic(1, 1, 1, 0, 0, 0, 0, 0, 0, -1), &gold );
-    // SceneDagNode* cone = raytracer.addObject( new GeneralQuadratic(1, -1, 1, 0, 0, 0, 0, 0, 0, -1), &gold );
-    SceneDagNode* cylinder = raytracer.addObject( new GeneralQuadratic(1, 0, 1, 0, 0, 0, 0, 0, 0, -1), &gold );
-    // SceneDagNode* elliptic_paraboloid = raytracer.addObject( new GeneralQuadratic(1, 0, 1, 0, 0, 0, 0, -1, 0, 0), &gold );
-    // SceneDagNode* hyperbolic_paraboloid = raytracer.addObject( new GeneralQuadratic(1, 0, -1, 0, 0, 0, 0, -1, 0, 0), &gold );
-    // SceneDagNode* two_sheet_hyperbeloid = raytracer.addObject( new GeneralQuadratic(-1, 1, -1, 0, 0, 0, 0, 0, 0, -1), &gold );
-    // SceneDagNode* plane = raytracer.addObject( new UnitSquare(), &jade );
-
-    // Apply some transformations to the unit square.
-
-    double factor1[3] = { 1.0, 3.0, 1.0 };
-    double factor2[3] = { 6.0, 6.0, 6.0 };
-    double factor3[3] = { 1, 1, 1 };
-    double factor4[3] = { 0.1, 0.1, 0.1 };
-
-    raytracer.translate(sphere, Vector3D(0, 0, -5));
-
-    raytracer.translate(cylinder, Vector3D(0, 0, -5));
-
-
-    // raytracer.rotate(sphere, 'x', -45);
-    // raytracer.scale(sphere, Point3D(0, 0, 0), factor1);
-
-    // raytracer.translate(two_sheet_hyperbeloid, Vector3D(0, 0, -5));
-    // raytracer.scale(two_sheet_hyperbeloid, Point3D(0, 0, 0), factor4);
-
-    // raytracer.translate(elliptic_paraboloid, Vector3D(0, -5, -5));
-    // raytracer.rotate(elliptic_paraboloid, 'x', -90);
-
-    // raytracer.translate(cone, Vector3D(0, 0, -5));
-    // raytracer.rotate(cone, 'x', -45);
-    // raytracer.rotate(cone, 'z', 45);
-    // raytracer.scale(cone, Point3D(0, 0, 0), factor1);
-
-    // raytracer.translate(cylinder, Vector3D(0, 0, -5));
-    // raytracer.rotate(cylinder, 'x', -45);
-    // raytracer.rotate(cylinder, 'z', 45);
-    // raytracer.scale(cylinder, Point3D(0, 0, 0), factor3);
-
-    // raytracer.translate(plane, Vector3D(0, 0, -7));
-    // raytracer.rotate(plane, 'z', 45);
-    // raytracer.scale(plane, Point3D(0, 0, 0), factor2);
-
-    // Render the scene, feel free to make the image smaller for
-    // testing purposes.
-    raytracer.render(width, height, eye, view, up, fov, scene_num);
-
-    // Render it from a different point of view.
-    Point3D eye2(4, 2, 1);
-    Vector3D view2(-4, -2, -6);
-    raytracer.render(width, height, eye2, view2, up, fov, scene_num);
-  } else if (scene_num == 6) {
 
     // Defines a point light source.
     Point3D eye(0, 0, 5);
@@ -846,6 +783,35 @@ int main(int argc, char* argv[])
     raytracer.scale(glass_s2, Point3D(0, 0, 0), factor2);
 
     // Render the scene
+    raytracer.render(width, height, eye, view, up, fov, scene_num);
+  } else if (scene_num == 6) {
+    // Defines a point light source.
+    Point3D eye(0, 0, 5);
+    Vector3D view(0, 0, -1);
+    Vector3D up(0, 1, 0);
+    double fov = 60;
+
+    raytracer.addLightSource( new PointLight(Point3D(0, 0, 3), Colour(0.9, 0.9, 0.9)));
+
+    // Add a unit square into the scene with material mat.
+    SceneDagNode* sphere = raytracer.addObject( new GeneralQuadratic(1, 1, 1, 0, 0, 0, 0, 0, 0, -1), &gold );
+    SceneDagNode* cone = raytracer.addObject( new GeneralQuadratic(1, -1, 1, 0, 0, 0, 0, 0, 0, 0), &ruby );
+    SceneDagNode* one_sheet_hyperboloid = raytracer.addObject( new GeneralQuadratic(1, -1, 1, 0, 0, 0, 0, 0, 0, -1), &emerald );
+    SceneDagNode* cylinder = raytracer.addObject( new GeneralQuadratic(1, 0, 1, 0, 0, 0, 0, 0, 0, -1), &jade );
+    SceneDagNode* elliptic_paraboloid = raytracer.addObject( new GeneralQuadratic(1, 0, 1, 0, 0, 0, 0, -1, 0, 0), &silver );
+
+    // Apply some transformations to the unit square.
+
+    raytracer.translate(sphere, Vector3D(3, 0, -5));
+
+    raytracer.translate(cylinder, Vector3D(-2, 0, -5));
+
+    raytracer.translate(cone, Vector3D(7, 0, -8));
+
+    raytracer.translate(one_sheet_hyperboloid, Vector3D(-7, 0, -10));
+
+    raytracer.translate(elliptic_paraboloid, Vector3D(1, -10, -30));
+
     raytracer.render(width, height, eye, view, up, fov, scene_num);
   }
   return 0;
