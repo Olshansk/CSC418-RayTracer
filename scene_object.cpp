@@ -27,10 +27,8 @@ bool UnitSquare::intersect( Ray3D& ray, const Matrix4x4& worldToModel,
   Point3D modelPoint = worldToModel*ray.origin;
   Vector3D modelDirection = worldToModel*ray.dir;
 
-  // The square's normal and a point on the square
-  printf("%f\n", ray.origin[2]);
-  Vector3D normal = Vector3D(0, 0, ray.origin[2] > 0 ? 1 : -1);
-  normal = worldToModel * normal;
+  Vector3D normal = Vector3D(0, 0, 1);
+
   normal.normalize();
   Point3D q1 = Point3D(0, 0, 0);
 

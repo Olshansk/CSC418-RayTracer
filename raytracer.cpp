@@ -659,12 +659,19 @@ int main(int argc, char* argv[])
       Colour(0.508273, 0.508273, 0.508273),
       51.2, 1, 0.2, UNUSED_MATERIAL_PROPERTY_VALUE, UNUSED_MATERIAL_PROPERTY_VALUE);
   Material glass( Colour(0, 0, 0), Colour(0.0, 0.0, 0.0),
+      51.2, 1, 0.2, UNUSED_MATERIAL_PROPERTY_VALUE, UNUSED_MATERIAL_PROPERTY_VALUE);
+  Material glass1( Colour(0, 0, 0), Colour(0.0, 0.0, 0.0),
       Colour(0.0, 0.0, 0.0),
-      0.1, 1, 0, 1.6);
-  Material turquoise( Colour(0.1, 0.18725, 0.1745), Colour(0.396, 0.74151, 0.69102),
+      0.1, 1, 0, 1.6, UNUSED_MATERIAL_PROPERTY_VALUE);
+  Material glass2( Colour(0, 0, 0), Colour(0.0, 0.0, 0.0),
+      Colour(0.0, 0.0, 0.0),
+      0.1, 1, 0, 1.3, UNUSED_MATERIAL_PROPERTY_VALUE);
+  Material blue( Colour(0.1, 0.18725, 0.1745), Colour(0.68, 0.98, 0.95),
       Colour(0.297254, 0.30829, 0.306678),
-      0.1, 1, 0.1, UNUSED_MATERIAL_PROPERTY_VALUE);
-
+      0.1, 1, 0.1, UNUSED_MATERIAL_PROPERTY_VALUE, UNUSED_MATERIAL_PROPERTY_VALUE);
+  Material green( Colour(0, 0, 0), Colour(0.23, 0.95, 0.30),
+      Colour(0.316228, 0.316228, 0.316228),
+      12.8, 0.3, 0.2, UNUSED_MATERIAL_PROPERTY_VALUE, UNUSED_MATERIAL_PROPERTY_VALUE);
   if (scene_num == 1) {
     // Camera parameters.
     Point3D eye(0, 0, 1);
@@ -826,122 +833,38 @@ int main(int argc, char* argv[])
     Vector3D up(0, 1, 0);
     double fov = 60;
 
-    raytracer.addLightSource( new PointLight(Point3D(0, 0, 2),
-          Colour(0.9, 0.9, 0.9) ) );
+    raytracer.addLightSource( new PointLight(Point3D(-5, 0, 5), Colour(0.9, 0.9, 0.9) ) );
 
-    SceneDagNode* bottom_plane = raytracer.addObject( new Plane(), &jade );
-    SceneDagNode* top_plane = raytracer.addObject( new Plane(), &turquoise );
-    // SceneDagNode* left_plane = raytracer.addObject( new UnitSquare(), &ruby );
-    // SceneDagNode* right_plane = raytracer.addObject( new UnitSquare(), &emerald );
+    SceneDagNode* plane = raytracer.addObject( new Plane(), &jade );
+    SceneDagNode* bottom_plane = raytracer.addObject( new Plane(), &blue );
+    SceneDagNode* glass_s1 = raytracer.addObject( new UnitSphere(), &glass1 );
+    SceneDagNode* glass_s2 = raytracer.addObject( new UnitSphere(), &glass2 );
 
+    double factor1[3] = { 0.2, 0.2, 0.2 };
+    double factor2[3] = { 0.8, 0.8, 0.8 };
 
-    // raytracer.translate(left_plane, Vector3D(-4, 0, 0));
-    // raytracer.rotate(left_plane, 'y', 30);
-    // raytracer.scale(left_plane, Point3D(0, 0, 0), factor1);
+    for (int i = -3; i < 3; i++) {
+      for (int j = -3; j < 3; j++) {
+        SceneDagNode* sphere = raytracer.addObject( new UnitSphere(), &gold );
+        raytracer.translate(sphere, Vector3D(i, j, -6));
+        raytracer.scale(sphere, Point3D(0, 0, 0), factor1);
+      }
+    }
 
-    // raytracer.translate(right_plane, Vector3D(4, 0, 0));
-    // raytracer.rotate(right_plane, 'y', -30);
-    // raytracer.scale(right_plane, Point3D(0, 0, 0), factor1);
+    raytracer.translate(bottom_plane, Vector3D(0, -4, -2));
+    raytracer.rotate(bottom_plane, 'x', 90);
 
-    raytracer.translate(top_plane, Vector3D(0, 3, -1));
-    raytracer.rotate(top_plane, 'x', 90);
-    // raytracer.scale(top_plane, Point3D(0, 0, 0), factor1);
+    raytracer.translate(plane, Vector3D(0, 3, -10));
+    raytracer.rotate(plane, 'x', 60);
 
-    raytracer.translate(bottom_plane, Vector3D(0, -3, -1));
-    raytracer.rotate(bottom_plane, 'x', -90);
-    // raytracer.scale(bottom_plane, Point3D(0, 0, 0), factor1);
+    raytracer.translate(glass_s1, Vector3D(-3, 0, -2));
+    raytracer.scale(glass_s1, Point3D(0, 0, 0), factor2);
 
-    // raytracer.translate(right_plane, Vector3D(0, -1, 0));
-    // raytracer.rotate(right_plane, 'y', -90);
-
-    // raytracer.translate(top_plane, Vector3D(0, -1, 0));
-    // raytracer.rotate(top_plane, 'x', 90);
-
-    // raytracer.translate(bottom_plane, Vector3D(0, -1, 0));
-    // raytracer.rotate(bottom_plane, 'x', -90);
+    raytracer.translate(glass_s2, Vector3D(1, -1, 0));
+    raytracer.scale(glass_s2, Point3D(0, 0, 0), factor2);
 
     // Render the scene
     raytracer.render(width, height, eye, view, up, fov, scene_num);
-    // Point3D eye(0, 0, 1);
-    // Vector3D view(0, 0, -1);
-    // Vector3D up(0, 1, 0);
-    // double fov = 60;
-
-    // raytracer.addLightSource( new PointLight(Point3D(-1, 5, -2),
-    //       Colour(0.9, 0.9, 0.9) ) );
-
-    // // Add a unit square into the scene with material mat.
-    // // SceneDagNode* sphere = raytracer.addObject( new UnitSphere(), &glass );
-    // // SceneDagNode* plane_left = raytracer.addObject( new UnitSquare(), &emerald );
-    // // SceneDagNode* plane_mid= raytracer.addObject( new UnitSquare(), &jade );
-    // // SceneDagNode* plane_right = raytracer.addObject( new UnitSquare(), &ruby );
-    // SceneDagNode* plane_top = raytracer.addObject( new UnitSquare(), &silver );
-    // SceneDagNode* plane_bottom = raytracer.addObject( new UnitSquare(), &emerald );
-    // // SceneDagNode* sphere1 = raytracer.addObject( new UnitSphere(), &gold );
-    // // SceneDagNode* sphere2 = raytracer.addObject( new UnitSphere(), &gold );
-    // // SceneDagNode* sphere3 = raytracer.addObject( new UnitSphere(), &silver);
-    // // SceneDagNode* sphere4 = raytracer.addObject( new UnitSphere(), &gold );
-    // // SceneDagNode* sphere5 = raytracer.addObject( new UnitSphere(), &gold );
-    // // SceneDagNode* glass_sphere = raytracer.addObject( new UnitSphere(), &glass );
-
-    // // Apply some transformations to the unit square.
-    // double factor1[3] = { 0.3, 0.3, 0.3 };
-    // double factor2[3] = { 6.0, 6.0, 6.0 };
-    // double factor3[3] = { 0.3, 0.5, 0.5 };
-    // double factor4[3] = { 5.0, 10.0, 10.0 };
-    // double factor5[3] = { 10, 10.0, 10.0 };
-
-    // // raytracer.rotate(plane_left, 'y', 30);
-    // // raytracer.translate(plane_left, Vector3D(-6, 0, 0));
-    // // raytracer.scale(plane_left, Point3D(0, 0, 0), factor2);
-
-    // // raytracer.translate(plane_mid, Vector3D(0, 0, -1.5));
-    // // raytracer.scale(plane_mid, Point3D(0, 0, 0), factor4);
-
-    // // raytracer.rotate(plane_right, 'y', -30);
-    // // raytracer.translate(plane_right, Vector3D(6, 0, 0));
-    // // raytracer.scale(plane_right, Point3D(0, 0, 0), factor2);
-
-    // raytracer.translate(plane_bottom, Vector3D(0, -1, 0));
-    // raytracer.rotate(plane_bottom, 'x', -90);
-
-    // raytracer.translate(plane_top, Vector3D(0, -1, 0));
-    // raytracer.rotate(plane_top, 'x', 90);
-
-    // // raytracer.scale(plane_top, Point3D(0, 0, 0), factor5);
-    // // raytracer.rotate(plane_top, 'x', -60);
-    // // raytracer.translate(plane_top, Vector3D(0, -2, 0));
-
-    // // raytracer.translate(sphere1, Vector3D(0, 0, 2));
-    // // raytracer.scale(sphere1, Point3D(0, 0, 0), factor1);
-
-    // // raytracer.translate(sphere2, Vector3D(0, 4, 2));
-    // // raytracer.scale(sphere2, Point3D(0, 0, 0), factor1);
-
-    // // raytracer.translate(sphere3, Vector3D(0, -4, 2));
-    // // raytracer.scale(sphere3, Point3D(0, 0, 0), factor1);
-
-    // // raytracer.translate(sphere4, Vector3D(4, 0, 2));
-    // // raytracer.scale(sphere4, Point3D(0, 0, 0), factor1);
-
-    // // raytracer.translate(sphere5, Vector3D(-4, 0, 2));
-    // // raytracer.scale(sphere5, Point3D(0, 0, 0), factor1);
-
-    // // raytracer.translate(glass_sphere, Vector3D(0, 0, 7));
-
-    // // raytracer.rotate(sphere, 'x', -45);
-    // // raytracer.rotate(sphere, 'z', 45);
-    // // raytracer.scale(sphere, Point3D(0, 0, 0), factor1);
-
-    // // raytracer.translate(sphere_gold, Vector3D(3, 0, -6));
-    // // raytracer.scale(sphere_gold, Point3D(0, 0, 0), factor1);
-
-
-
-
-
-
-    // raytracer.render(width, height, eye, view, up, fov, scene_num);
   }
   return 0;
 }
