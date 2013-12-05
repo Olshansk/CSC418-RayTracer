@@ -260,6 +260,10 @@ void Raytracer::applyReflectance ( Ray3D& ray ) {
   double reflectance = refractionParams.second;
 
   Colour refractionAndReflaction = reflectance * reflectionColour + (1.0 - reflectance) * refractionColour;
+  double reflection = ray.intersection.mat->reflection ;
+  if (!(reflection > UNUSED_MATERIAL_PROPERTY_VALUE)){
+    reflection = 1.0;
+  }
   ray.col += ray.intersection.mat->reflection * refractionAndReflaction;
   ray.col.clamp();
 }
