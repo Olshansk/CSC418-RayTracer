@@ -200,9 +200,13 @@ void Raytracer::traverseScene( SceneDagNode* node, Ray3D& ray, Matrix4x4 modelTo
   modelToWorld = modelToWorld*node->invtrans;
 }
 
+// Determine if the ray lies in the shadow relative to the light passed in
 bool Raytracer::isIntersectionInShadow( Ray3D& ray, LightSource* light ) {
+  // retrieve the shadow ray
   Ray3D shadowRay = light->getShadowRay(ray);
+  // Traverse the scene to determine if the shadow ray collides with any objets in the scene
   traverseScene(_root, shadowRay, Matrix4x4(), Matrix4x4());
+  //Determine if the intersection (if it exists) lies between the ray's origin and light source
   return (!shadowRay.intersection.none && shadowRay.intersection.t_value > 0 && shadowRay.intersection.t_value <= 1);
 }
 
@@ -238,12 +242,16 @@ Colour Raytracer::getReflectionColour( Ray3D& ray ) {
   }
   return Colour(0, 0, 0);
 }
-
+// Retrieves the refraction colour and the reflectance
 std::pair <Colour,double> Raytracer::getRefractionColour( Ray3D& ray ) {
+// Check if reflaction is enabled
 if (ray.intersection.mat->n > UNUSED_MATERIAL_PROPERTY_VALUE && ray.refractionNumber < max_refraction) {
+    // Retrieve the refraction ray and the reflectance
     std::pair <Ray3D,double> refractionParams = LightSource::getRefractionRay(ray);
     Ray3D refractionRay = refractionParams.first;
+    // Check to make sure sure that refraction is possible at the intersection position.
     if (!(refractionRay.dir[0] == 0 && refractionRay.dir[1] == 0 && refractionRay.dir[2] == 0)) {
+      // Return the reflectance and the shaded colour of the reflected ray
       double reflectance = refractionParams.second;
       Colour rfr_col = shadeRay(refractionRay);
       return std::make_pair(rfr_col, reflectance);
@@ -252,18 +260,24 @@ if (ray.intersection.mat->n > UNUSED_MATERIAL_PROPERTY_VALUE && ray.refractionNu
   return std::make_pair(Colour(0, 0, 0), 1.0);
 }
 
+// Applies reflection and refraction to the ray passed in
 void Raytracer::applyReflectance ( Ray3D& ray ) {
+  // Retrieves the reflection and refraction colours at the intersection point
   std::pair <Colour, double> refractionParams = getRefractionColour(ray);
   Colour reflectionColour = getReflectionColour(ray);
   Colour refractionColour= refractionParams.first;
+  // Retrieves the reflectance at the intersection point
   double reflectance = refractionParams.second;
-
+  // Mixes the reflection and refraction colours at the current point
   Colour refractionAndReflaction = reflectance * reflectionColour + (1.0 - reflectance) * refractionColour;
+  //Allows refraction to still take place even if refraction is enabled and reflection is disabled
   double reflection = ray.intersection.mat->reflection ;
   if (!(reflection > UNUSED_MATERIAL_PROPERTY_VALUE)){
     reflection = 1.0;
   }
+  // Applies reflection and refraction to the current color
   ray.col += ray.intersection.mat->reflection * refractionAndReflaction;
+  // Clamps the color to white
   ray.col.clamp();
 }
 
