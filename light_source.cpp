@@ -104,6 +104,9 @@ Ray3D LightSource::getReflectionRay( Ray3D& ray ) {
   return reflectionRay;
 }
 
+// Retrieves the 3D ray used to determine the refraction at the current intersection.
+// This method also determines the reflectance ratio if both reflection and refraction are
+// to be calculate at the point of intersection
 std::pair <Ray3D,double> LightSource::getRefractionRay( Ray3D& ray ) {
   // The ray's origin point is at the location of the itnersection of the previous ray
   Vector3D normal = ray.intersection.normal;
@@ -112,6 +115,8 @@ std::pair <Ray3D,double> LightSource::getRefractionRay( Ray3D& ray ) {
   // The default case is when the ray travels from the vaccum in an object
   double n1 = 1.0f; //Refractive index of the vaccum
   double n2 = ray.intersection.mat->n; //Refractive index
+
+  // Determine if the ray is entering or exiting the medium
   bool isExiting = !(normal.dot(ray.dir) < 0);
 
   if (isExiting) {
@@ -127,6 +132,7 @@ std::pair <Ray3D,double> LightSource::getRefractionRay( Ray3D& ray ) {
     }
   }
 
+  // Determine the ratio of the two refractive indecies
   double n = n1 / n2;
 
   double cosI = normal.dot(dir);
@@ -144,6 +150,7 @@ std::pair <Ray3D,double> LightSource::getRefractionRay( Ray3D& ray ) {
 
   // The ray's origin point is at the location of the itnersection of the previous ray
   Point3D origin = ray.intersection.point;
+  // Direction of the refractive ray
   Vector3D direction = (n*cosI-cosT)*normal-(n*dir);
   direction.normalize();
   Ray3D refractionRay = Ray3D(origin, direction);
