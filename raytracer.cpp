@@ -338,7 +338,7 @@ Colour Raytracer::shadeSingleViewRay(Matrix4x4 viewToWorld, Point3D imagePlane, 
 }
 
 Colour Raytracer::shadeViewRay(Matrix4x4 viewToWorld, Point3D imagePlane, Point3D origin) {
-  // If depth of field enabled, shoot out random rays within the camera's aperature
+  // If depth of field enabled, spawn out random rays within the camera's aperature
   if (depth_of_field) {
     Colour col = Colour();
     for (int m = 0; m < depth_of_field_rays; m++) {
@@ -387,9 +387,6 @@ void Raytracer::render( int width, int height, Point3D eye, Vector3D view,
     }
 
     for (int j = 0; j < _scrWidth; j++) {
-      // Sets up ray origin and direction in view space,
-      // image plane is at z = -1.
-
       Point3D origin(0, 0, 0);
       Point3D imagePlaneOrig, imagePlane;
       imagePlaneOrig[0] = (-double(width)/2 + j)/factor;
@@ -444,7 +441,7 @@ void Raytracer::render( int width, int height, Point3D eye, Vector3D view,
               colourDiff(col1, col4, threshold) || colourDiff(col2, col3, threshold) ||
               colourDiff(col2, col4, threshold) || colourDiff(col3, col4, threshold);
 
-          // If the corners are different, then shoot more random rays to reduce aliasing.
+          // If the corners are different, then spawn more random rays to reduce aliasing.
           if (cornersDifferent) {
             col = subsampleRay(imagePlaneOrig, imagePlane, factor, viewToWorld, origin);
             col += col1 + col2 + col3 + col4;
@@ -483,6 +480,7 @@ void Raytracer::render( int width, int height, Point3D eye, Vector3D view,
   flushPixelBuffer(strdup(sstm.str().c_str()));
 }
 
+// Print the help
 void printUsage() {
   printf(
     "Usage: raytracer [options]\n"

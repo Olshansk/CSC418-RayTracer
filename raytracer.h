@@ -103,9 +103,9 @@ public:
   // Apply scaling about a fixed point origin.
   void scale( SceneDagNode* node, Point3D origin, double factor[3] );
 
+  // Parameters specified from CLI
   bool antialias;
   int antialias_rays;
-
   bool depth_of_field;
   int depth_of_field_rays;
   float depth_of_field_aperature;
@@ -124,13 +124,16 @@ private:
   // Saves the pixel buffer to a file and deletes the buffer.
   void flushPixelBuffer(char *file_name);
 
+  // Shade a point on the image plane and anti-alias that pixel by spawning many rays
   Colour subsampleRay(Point3D imagePlaneOrig, Point3D imagePlane, double factor,
       Matrix4x4 viewToWorld, Point3D origin);
 
+  // Shade a single ray, from the origin towards a point on the image plane.
+  // This will never spawn more than 1 ray
   Colour shadeSingleViewRay(Matrix4x4 viewToWorld, Point3D imagePlane, Point3D origin);
 
   // Return the colour of a ray given by the origin and the point on the
-  // plane to shade
+  // plane to shade. This will spawn many rays if depth of field is enabled.
   Colour shadeViewRay(Matrix4x4 viewToWorld, Point3D imagePlane, Point3D origin);
 
   // Return the colour of the ray after intersection and shading, call
