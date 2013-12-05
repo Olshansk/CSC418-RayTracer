@@ -498,6 +498,8 @@ void printUsage() {
     "    You must use one of the 3 rendering modes.\n"
     "\n"
     "--scene 1                     pick which scene to render\n"
+    "    You must select a scene.\n"
+    "\n"
     "--width 320                   width of image to render\n"
     "--height 240                  height of image to render\n"
     "--antialias 4                 number of rays to use for antialias subsampling\n"
