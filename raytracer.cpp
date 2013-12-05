@@ -206,7 +206,6 @@ bool Raytracer::isIntersectionInShadow( Ray3D& ray, LightSource* light ) {
   return (!shadowRay.intersection.none && shadowRay.intersection.t_value > 0 && shadowRay.intersection.t_value <= 1);
 }
 
-// Potentially TODO: Normalize t_value somehow.
 Colour Raytracer::getReflectionColour( Ray3D& ray ) {
   Material* mat = ray.intersection.mat;
   if (mat->reflection > UNUSED_MATERIAL_PROPERTY_VALUE && ray.reflectionNumber < max_reflection) {
