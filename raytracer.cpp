@@ -497,7 +497,7 @@ void printUsage() {
     "--phong                       render a scene with all three terms of the Phong model\n"
     "    You must use one of the 3 rendering modes.\n"
     "\n"
-    "--scene 1                     pick which scene to render"
+    "--scene 1                     pick which scene to render\n"
     "--width 320                   width of image to render\n"
     "--height 240                  height of image to render\n"
     "--antialias 4                 number of rays to use for antialias subsampling\n"
